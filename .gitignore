@@ -2,6 +2,13 @@
 references/*
 data/*
 log/*
+tmp/*
+
+log.json
+raw_log_data.json
+run_multiple.sh
+
+run_eval.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

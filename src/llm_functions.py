@@ -5,8 +5,10 @@ from typing import List, Dict, Union
 
 import torch
 from datasets.utils.logging import disable_progress_bar
-from langchain import PromptTemplate
-from langchain.llms import VLLM
+# from langchain import PromptTemplate
+from langchain_core.prompts import PromptTemplate
+# from langchain.llms import VLLM
+from langchain_community.llms import VLLM
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from tqdm import tqdm
 
@@ -56,13 +58,26 @@ def collect_llm_output(llm, inputs, output_parser, prompt_template, extract_scor
         # get the format instructions from the output parser and use only the json markdown example from it
         format_instructions = output_parser.get_format_instructions().split("\n\n")[-1]
         prompt_template = prompt_template.partial(format_instructions=format_instructions)
-
+    
     chain = prompt_template | llm
+    print('------')
+    # print('prompt_template:', prompt_template)
+    # print('llm:', llm)
+    # print('chain:', chain)
     if isinstance(inputs, dict):
         inputs = [inputs]
-
+    print('before chain.batch')
+    # print('type(chain):', type(chain))
+    # print('type(inputs):', type(inputs))
+    # print('inputs[0].keys():', inputs[0].keys())
+    # # print('inputs[0].items()[0]:', list(inputs[0].items())[0])
+    # print('inputs[0][essay]', inputs[0]['essay'])
+    print('inputs[0]', inputs[0])
+    # print('inputs[0][id]', inputs[0]['id'])
+    # print('inputs[1][essay]', inputs[1]['essay'])
+    # print('inputs[1][id]', inputs[1]['id'])
     llm_outputs = chain.batch(inputs)
-
+    print('llm_outputs:', llm_outputs)
     if not extract_scores:
         for i, output in enumerate(llm_outputs):
             inputs[i].update({"output": output})

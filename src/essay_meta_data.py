@@ -173,6 +173,21 @@ examples_set_1 = [
     },
 ]
 
+fine_grained_rubric_essay_set_1 ={
+    'details': {
+        'prompt': "The essay has fully elaborated reasons with specific details."
+    },
+    'organization': {
+        'prompt': 'The essay exhibits strong organization.'
+    },
+    'transition': {
+        'prompt': "The essay is fluent and uses sophisticated transitional language."
+    },
+    'awareness': {
+        'prompt': "The essay shows a heightened awareness of audience.",
+    }
+}
+
 essay_set_1 = {
     "number_of_essays": 1785,
     "average_length": 350.0,
@@ -183,6 +198,7 @@ essay_set_1 = {
     "prompt": prompt_essay_set_1,
     "scoring_rubric": scoring_rubric_set_1,
     "examples": examples_set_1,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_1
 }
 
 
@@ -502,6 +518,27 @@ examples_set_2 = [
     },
 ]
 
+fine_grained_rubric_essay_set_2 ={
+    # 'content': {
+    #     'prompt': "The essay presents a unifying theme or main idea without going off on tangents"
+    # },
+    # 'organization': {
+    #     'prompt': 'The essay is organized logically'
+    # },
+    # 'style': {
+    #     'prompt': "The essay exhibits exceptional word usage"
+    # },
+    # 'voice': {
+    #     'prompt': "The essay demonstrates effective adjustment of language and tone to task and reader",
+    # }
+    'Writing Applications': {
+        'prompt': "The essay fully accomplishes the task in a thorough and insightful manner and has a distinctive quality that sets it apart as an outstanding performance."
+    },
+    'Language Conventions': {
+        'prompt': "The essay the writing sample exhibit a superior command of language skills. The paper provides evidence that the student has a thorough control of the concepts outlined in the Indiana Academic Standards associated with the student's grade level."
+    }
+}
+
 essay_set_2 = {
     "number_of_essays": 1800,
     "average_length": 350.0,
@@ -512,6 +549,7 @@ essay_set_2 = {
     "prompt": prompt_essay_set_2,
     "scoring_rubric": scoring_rubric_set_2,
     "examples": examples_set_2,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_2
 }
 
 
@@ -641,6 +679,18 @@ examples_set_3 = [
     },
 ]
 
+fine_grained_rubric_essay_set_3 ={
+    'address_question': {
+        'prompt': "The essay addresses the demands of the question"
+    },
+    'implied_info': {
+        'prompt': 'The essay uses expressed and implied information from the text'
+    },
+    'clarification': {
+        'prompt': "The essay clarifies and extends understanding beyond the literal"
+    }
+}
+
 essay_set_3 = {
     "number_of_essays": 1726,
     "average_length": 150.0,
@@ -651,6 +701,7 @@ essay_set_3 = {
     "prompt": prompt_essay_set3,
     "scoring_rubric": scoring_rubric_set_3,
     "examples": examples_set_3,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_3
 }
 
 
@@ -748,6 +799,18 @@ scoring_rubric_set_4 = {
     },
 }
 
+fine_grained_rubric_essay_set_4 ={
+    'address_question': {
+        'prompt': "The essay addresses the demands of the question"
+    },
+    'implied_info': {
+        'prompt': 'The essay uses expressed and implied information from the text'
+    },
+    'clarification': {
+        'prompt': "The essay clarifies and extends understanding beyond the literal"
+    }
+}
+
 examples_set_4 = [
     {
         "Overall": 1,
@@ -811,6 +874,7 @@ essay_set_4 = {
     "prompt": prompt_essay_set4,
     "scoring_rubric": scoring_rubric_set_4,
     "examples": examples_set_4,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_4
 }
 
 
@@ -932,6 +996,21 @@ examples_set_5 = [
     },
 ]
 
+fine_grained_rubric_essay_set_5 ={
+    'clarity': {
+        'prompt': "The essay contains a clear description of the mood created by the author"
+    },
+    'completeness': {
+        'prompt': 'The essay contains a complete description of the mood created by the author'
+    },
+    'accurate': {
+        'prompt': "The essay contains an accurate description of the mood created by the author"
+    },
+    'relevant': {
+        'prompt': 'The essay includes relevant and specific information from the memoir.'
+    }
+}
+
 essay_set_5 = {
     "number_of_essays": 1805,
     "average_length": 150.0,
@@ -942,6 +1021,7 @@ essay_set_5 = {
     "prompt": prompt_essay_set_5,
     "scoring_rubric": scoring_rubric_set_5,
     "examples": examples_set_5,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_5
 }
 
 
@@ -1072,6 +1152,21 @@ examples_set_6 = [
     },
 ]
 
+fine_grained_rubric_essay_set_6 ={
+    'clarity': {
+        'prompt': "The essay contains a clear description of the obstacles the builders of the Empire State Building faced in attempting to allow dirigibles to dock there."
+    },
+    'completeness': {
+        'prompt': 'The essay contains a complete description of the obstacles the builders of the Empire State Building faced in attempting to allow dirigibles to dock there.'
+    },
+    'accurate': {
+        'prompt': "The essay contains an accurate description of the obstacles the builders of the Empire State Building faced in attempting to allow dirigibles to dock there."
+    },
+    'relevant': {
+        'prompt': 'The essay includes relevant and specific information from the excerpt'
+    }
+}
+
 essay_set_6 = {
     "number_of_essays": 1800,
     "average_length": 150.0,
@@ -1082,6 +1177,7 @@ essay_set_6 = {
     "prompt": prompt_essay_set_6,
     "scoring_rubric": scoring_rubric_set_6,
     "examples": examples_set_6,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_6
 }
 
 
@@ -1269,6 +1365,21 @@ examples_set_7 = [
     },
 ]
 
+fine_grained_rubric_essay_set_7 ={
+    'Ideas': {
+        'prompt': "The essay shows ideas that are clearly focused on the topic and are thoroughly developed with specific, relevant details.",
+    },
+    'Organization': {
+        'prompt': 'The essay shows organization and connections between ideas and/or events are clear and logically sequenced. ',
+    },
+    'Style': {
+        'prompt': "The essay shows command of language, including effective and compelling word choice and varied sentence structure, clearly supports the writer's purpose and audience.",
+    },
+    'Conventions': {
+        'prompt': 'The essay shows consistent, appropriate use of conventions of Standard English for grammar, usage, spelling, capitalization, and punctuation for the grade level.',
+    }
+}
+
 essay_set_7 = {
     "number_of_essays": 1730,
     "average_length": 250.0,
@@ -1279,6 +1390,7 @@ essay_set_7 = {
     "prompt": prompt_essay_set_7,
     "scoring_rubric": scoring_rubric_set_7,
     "examples": examples_set_7,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_7
 }
 
 IDEAS_AND_CONTENT = "Ideas and Content"
@@ -1786,6 +1898,35 @@ examples_set_8 = [
     },
 ]
 
+
+IDEAS_AND_CONTENT = "Ideas and Content"
+ORGANIZATION = "Organization"
+SENTENCE_FLUENCY = "Sentence Fluency"
+CONVENTIONS = "Conventions"
+VOICE = "Voice"
+WORD_CHOICE = "Word Choice"
+
+fine_grained_rubric_essay_set_8 ={
+    IDEAS_AND_CONTENT: {
+        'prompt': "The writing is clear, focused, and interesting. Main ideas stand out and are developed by strong support and rich details suitable to audience and purpose",
+    },
+    ORGANIZATION: {
+        'prompt': 'The organization enhances the central idea(s) and its development. The order and structure are compelling and move the reader through the text easily.',
+    },
+    SENTENCE_FLUENCY: {
+        'prompt': 'The writing has an effective flow and rhythm. Sentences show a high degree of craftsmanship, with consistently strong and varied structure that makes expressive oral reading easy and enjoyable.'
+    },
+    CONVENTIONS: {
+        'prompt': 'The writing demonstrates exceptionally strong control of standard writing conventions (e.g., punctuation, spelling, capitalization, grammar and usage) and uses them effectively to enhance communication. Errors are so few and so minor that the reader can easily skim right over them unless specifically searching for them.',
+    },
+    VOICE: {
+        'prompt': 'The writer has chosen a voice appropriate for the topic, purpose, and audience. The writer demonstrates deep commitment to the topic, and there is an exceptional sense of “writing to be read.” The writing is expressive, engaging, or sincere.'
+    },
+    WORD_CHOICE: {
+        'prompt': "Words convey the intended message in an exceptionally interesting, precise, and natural way appropriate to audience and purpose. The writer employs a rich, broad range of words which have been carefully chosen and thoughtfully placed for impact.",
+    }
+}
+
 essay_set_8 = {
     "number_of_essays": 918,
     "average_length": 650.0,
@@ -1796,6 +1937,7 @@ essay_set_8 = {
     "prompt": prompt_essay_set_8,
     "scoring_rubric": scoring_rubric_set_8,
     "examples": examples_set_8,
+    "fine_grained_rubric": fine_grained_rubric_essay_set_8
 }
 
 essay_set_descriptions = [essay_set_1, essay_set_2, essay_set_3, essay_set_4, essay_set_5, essay_set_6, essay_set_7,

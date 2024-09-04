@@ -176,7 +176,7 @@ if __name__ == '__main__':
     # parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("--logging_data_path", type=str, default="./log.log")
-    parser.add_argument("--model", type=str, default="llama", choices=["llama", "mistral"])
+    parser.add_argument("--model", type=str, default="mistral", choices=["llama", "mistral"])
     parser.add_argument("--model_size", type=str, default="7b", choices=["7b", "13b"])
     parser.add_argument("--temperature", type=float, default=0.00)
     parser.add_argument("--max_length", type=int, default=4096)
@@ -203,13 +203,14 @@ if __name__ == '__main__':
         "setting": args.setting
     }
     config = Config(**config)
-
+    print("=> config:", config)
     set_seed(args.seed)
 
     llm, prompt_template = load_model(config, prompt_template)
     # print("=>prompt_template:", prompt_template)
     dataset = load_dataset("./data/datasets/folds", num_of_fold=1)
     # dataset = create_dataset_tmp()
+    # print("args.logging_data_path:", args.logging_data_path)
     analyse_dataset(
         llm, 
         dataset, 
