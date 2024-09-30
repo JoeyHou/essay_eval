@@ -1,0 +1,84 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "mistral_fg_v0_5/machine_rubric_exp_tmp3",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "llama3_fg_v0_1/machine_rubric_exp_tmp3",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "llama3",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_fg_v0_5/machine_rubric_exp_tmp1",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 1,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_fg_v0_5/machine_rubric_exp_tmp2",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 2,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_fg_v0_5/machine_rubric_exp_tmp4",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 4,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "llama3_fg_v0_1/machine_rubric_exp_tmp1",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 1,
+            "analysis_instruction": "explanation", 
+            "model": "llama3",
+            "limit": -1
+        },
+        {
+            "run_id": "llama3_fg_v0_1/machine_rubric_exp_tmp2",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 2,
+            "analysis_instruction": "explanation", 
+            "model": "llama3",
+            "limit": -1
+        },
+        {
+            "run_id": "llama3_fg_v0_1/machine_rubric_exp_tmp4",
+            "fine_grained": true,
+            "verbalize": false,
+            "use_machine_rubric": true,
+            "prompt_template": 4,
+            "analysis_instruction": "explanation", 
+            "model": "llama3",
+            "limit": -1
+        }
+    ]
+}

@@ -468,3 +468,16 @@ def load_mistral_vllm(max_length=4096, temperature=0.01):
     - VLLM: The loaded Mistral model.
     """
     return VLLM(model="mistralai/Mistral-7B-Instruct-v0.2", max_length=max_length, temperature=temperature)
+
+def load_gpt4_vllm(max_length=4096, temperature=0.01):
+    """
+    Load a Mistral model with specified parameters.
+
+    Parameters:
+    - max_length (int, optional): The maximum token length for the model's outputs. Defaults to 4096.
+    - temperature (float, optional): The temperature for sampling outputs. Defaults to 0.01.
+
+    Returns:
+    - VLLM: The loaded Mistral model.
+    """
+    return VLLM(model="mistralai/Mistral-7B-Instruct-v0.2", max_length=max_length, temperature=temperature)

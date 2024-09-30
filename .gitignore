@@ -3,6 +3,7 @@ references/*
 data/*
 log/*
 tmp/*
+archived/*
 
 log.json
 raw_log_data.json

@@ -1,5 +1,7 @@
 import pandas as pd
 import json
+import argparse
+import os 
 
 # import krippendorff
 import numpy as np
@@ -19,10 +21,23 @@ from essay_meta_data import essay_set_descriptions
 from evaluation_helpers import qwk
 
 
+def evaluation_batch(logging_data_dir):
+    all_results = []
+    for logging_data_path in os.listdir(logging_data_dir):
+        if 'mistral_' not in logging_data_path: continue 
+        result_df = evaluation(
+            args.logging_data_path, 
+            args.essay_data_path, 
+            args.metric
+        )
+        result_df['run_id'] = logging_data_path.replace('.json', '')
+        all_results.append(result_df)
+    return pd.concat(all_results)
+
 def evaluation(
+        
         logging_data_path = "./log.json", 
         essay_data_path = "./data/asap/training_set_rel3.xlsx", 
-        output_data_path = "./log/log_summary.csv", 
         metric = 'qwk'
     ):
 
@@ -31,7 +46,7 @@ def evaluation(
     df = pd.read_excel(essay_data_path, index_col="essay_id")
     df = df.drop(10534)  # this essay is not annotated 
     
-    # run_idx = 2
+    # run_idx = 1
     # var_lst = [
     #     "_var1", 
     #     "_var2", 
@@ -52,24 +67,35 @@ def evaluation(
     #     "chain_of_thought_detailed_prompt",
     #     "one_shot_prompt",
     # ]
-
     # new_prompt_lst = [] #[p for p in prompt_lst]
     # for var in var_lst:
     #     for p in prompt_lst:
     #         new_prompt_lst.append(p + var)
     # prompt_lst = new_prompt_lst
-
     # print('total num of prompt:', len(prompt_lst))
+    # experiments = [
+    #     {
+    #         "experiment_id": "test_{}".format(i),
+    #         # "data_path": logging_data_path,
+    #         "data_path": "./log/run_{}/mistral_7b_test_v1_{}".format(run_idx, prompt_lst[i]), #log_fp,
+    #         "prompt": prompt_lst[i],
+    #         "template": 3,
+    #         "variant": 1 if '_var' not in prompt_lst[i] else int(prompt_lst[i][-1]),
+    #         "model": "mistral",
+    #     } for i in range(len(prompt_lst))
+    # ]
+    # print('total num of experiments:', len(experiments))
 
     prompt_lst = ['fine_grained']
     experiments = [
         {
-            "experiment_id": "test_{}".format(i),
+            "experiment_id": "run_0",
+            # "data_path": logging_data_path,
             "data_path": logging_data_path,
             "prompt": prompt_lst[i],
-            "template": 3,
-            "variant": 1 if '_var' not in prompt_lst[i] else int(prompt_lst[i][-1]),
-            "model": "mistral",
+            "template": -1,
+            "variant": -1,
+            "model": "",
         } for i in range(len(prompt_lst))
     ]
     print('total num of experiments:', len(experiments))
@@ -147,7 +173,12 @@ def evaluation(
             # print(clean_predicted_scores.values)
         # print(4)
         # take the average over all folds
-        qwks = [sum(score) / len(score) for score in qwks]
+        qwks = [
+            sum(score) / len(score) if len(score) > 0 else -1
+            for score in qwks
+        ]
+
+        qwk_avg = np.mean([qwk for qwk in qwks if qwk != -1])
         # print(qwks)
         # save the results in a pandas dataframe
         new_df_entry = {}
@@ -157,15 +188,47 @@ def evaluation(
             filtered_df = df[df["essay_set"] == essay_set]
             calculated_qwk_filtered = qwks[essay_set - 1]
 
-            new_df_entry.update({'Average': sum(qwks) / len(qwks),
-                            'Incorrect Predictions': wrong_predictions, 'template': experiment['template'],
-                            'variant': experiment['variant'], 'prompt': experiment['prompt'], f"Essay Set {essay_set}": calculated_qwk_filtered})
+            new_df_entry.update({
+                'Average': qwk_avg,
+                'Incorrect Predictions': wrong_predictions, 'template': experiment['template'],
+                'variant': experiment['variant'], 'prompt': experiment['prompt'], f"Essay Set {essay_set}": calculated_qwk_filtered
+            })
         df_data.append(new_df_entry)
 
     # create the dataframe and save it to a csv file
     df_data = pd.DataFrame(df_data)
-
+    # print(file_loading_err)
+    # print(df_data)
+    # if 'prompt' in df_data
     df_data['prompt_group'] = df_data['prompt'].apply(lambda x: x if '_var' not in x else '_'.join(x.split('_')[:-1]) )
-    result_df = df_data.drop(columns = ["template", "variant", "prompt", "Incorrect Predictions"]).groupby('prompt_group').agg('mean').reset_index(drop = True)
-    result_df.to_csv(output_data_path)
+    result_df = df_data.drop(columns = ["template", "variant", "prompt", "Incorrect Predictions"]).groupby('prompt_group').agg('mean')#.reset_index(drop = True)
+    # result_df.to_csv(output_data_path)
     return result_df
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    
+    ## run configurations
+    # parser.add_argument("--config", type=str, default='')
+    parser.add_argument("--logging_data_path", type=str, default="./log.json")
+    parser.add_argument("--essay_data_path", type=str, default="./data/asap/training_set_rel3.xlsx")
+    parser.add_argument("--metric", type=str, default="qwk")
+    parser.add_argument("--qwk_summary_path", type=str)
+    args = parser.parse_args()
+
+    result_df = evaluation(
+        args.logging_data_path, 
+        args.essay_data_path, 
+        args.metric
+    )
+    # if '.json' in args.logging_data_path: # evaluate single output
+    #     result_df = evaluation(
+    #         args.logging_data_path, 
+    #         args.essay_data_path, 
+    #         args.metric
+    #     )
+    # elif os.path.isdir(args.logging_data_path):
+    #     result_df = evaluation_batch(args.logging_data_path)
+    # else:
+    #     raise NotImplementedError
+    result_df.to_csv(args.qwk_summary_path)

@@ -1,5 +1,5 @@
 from typing import Dict
-
+import copy
 
 def get_final_score1(scores1: Dict[str, int], scores2: Dict[str, int]):
     return int(scores1["Overall"]) + int(scores2["Overall"])
@@ -175,17 +175,110 @@ examples_set_1 = [
 
 fine_grained_rubric_essay_set_1 ={
     'details': {
-        'prompt': "The essay has fully elaborated reasons with specific details."
+        1: {
+            "description": "Contains few or vague details."
+        },
+        2: {
+            "description": "Contains only general reasons with unelaborated and/or list-like details."
+        },
+        3: {
+            "description": "Has reasons with minimal elaboration and more general than specific details."
+        },
+        4: {
+            "description": "Has adequately elaborated reasons with a mix of general and specific details."
+        },
+        5: {
+            "description": "Has moderately well elaborated reasons with mostly specific details."
+        },
+        6: {
+            "description": "Has fully elaborated reasons with specific details."
+        },
+        'overall_description': "The essay has fully elaborated reasons with specific details."
     },
     'organization': {
-        'prompt': 'The essay exhibits strong organization.'
+        1: {
+            "description": "Is awkward and fragmented."
+        },
+        2: {
+            "description": "Shows little or no evidence of organization."
+        },
+        3: {
+            "description": "Shows some organization."
+        },
+        4: {
+            "description": "Shows satisfactory organization."
+        },
+        5: {
+            "description": "Exhibits generally strong organization."
+        },
+        6: {
+            "description": "Exhibits strong organization."
+        },
+        "overall_description": 'The essay exhibits strong organization.'
     },
     'transition': {
-        'prompt': "The essay is fluent and uses sophisticated transitional language."
+        1: {
+            "description": "May be difficult to read and understand."
+        },
+        2: {
+            "description": "May be awkward and confused or simplistic."
+        },
+        3: {
+            "description": "May be awkward in parts with few transitions."
+        },
+        4: {
+            "description": "May be somewhat fluent with some transitional language."
+        },
+        5: {
+            "description": "May be moderately fluent with transitional language throughout."
+        },
+        6: {
+            "description": "Is fluent and uses sophisticated transitional language."
+        },
+        "overall_description": "The essay is fluent and uses sophisticated transitional language."
     },
     'awareness': {
-        'prompt': "The essay shows a heightened awareness of audience.",
+        1: {
+            "description": "May show no awareness of audience."
+        },
+        2: {
+            "description": "May show little awareness of audience."
+        },
+        3: {
+            "description": "Shows some awareness of audience."
+        },
+        4: {
+            "description": "Shows adequate awareness of audience."
+        },
+        5: {
+            "description": "May show a consistent awareness of audience."
+        },
+        6: {
+            "description": "May show a heightened awareness of audience."
+        },
+        "overall_description": "The essay shows a heightened awareness of audience."
     }
+}
+
+fine_grained_rubric_essay_set_1_machine = {
+    "Position Clarity": {
+        "overall_description": "The response should clearly state a position on the effects of computers on people."
+    }, 
+    "Support and Elaboration": {
+        "overall_description": "The response should provide reasons and details to support the stated position, with varying levels of specificity and elaboration."
+    },
+    "Organization": {
+        "overall_description": "The response should exhibit a logical structure, with ideas presented in a coherent and orderly manner."
+    }, 
+    "Fluency and Transitions": {
+        "overall_description": "The response should demonstrate smooth flow and use of transitional language to connect ideas."
+    }, 
+    "Audience Awareness": {
+        "overall_description": "The response should show an understanding of the audience, tailoring the message to engage and persuade readers effectively."
+    },
+    "Sophistication": {
+        "overall_description": "The response should use sophisticated language and demonstrate a thoughtful and nuanced understanding of the topic."
+    }, 
 }
 
 essay_set_1 = {
@@ -198,7 +291,8 @@ essay_set_1 = {
     "prompt": prompt_essay_set_1,
     "scoring_rubric": scoring_rubric_set_1,
     "examples": examples_set_1,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_1
+    "fine_grained_rubric": fine_grained_rubric_essay_set_1,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_1_machine
 }
 
 
@@ -518,25 +612,27 @@ examples_set_2 = [
     },
 ]
 
-fine_grained_rubric_essay_set_2 ={
-    # 'content': {
-    #     'prompt': "The essay presents a unifying theme or main idea without going off on tangents"
-    # },
-    # 'organization': {
-    #     'prompt': 'The essay is organized logically'
-    # },
-    # 'style': {
-    #     'prompt': "The essay exhibits exceptional word usage"
-    # },
-    # 'voice': {
-    #     'prompt': "The essay demonstrates effective adjustment of language and tone to task and reader",
-    # }
-    'Writing Applications': {
-        'prompt': "The essay fully accomplishes the task in a thorough and insightful manner and has a distinctive quality that sets it apart as an outstanding performance."
-    },
-    'Language Conventions': {
-        'prompt': "The essay the writing sample exhibit a superior command of language skills. The paper provides evidence that the student has a thorough control of the concepts outlined in the Indiana Academic Standards associated with the student's grade level."
-    }
+fine_grained_rubric_essay_set_2 = copy.deepcopy(scoring_rubric_set_2)
+fine_grained_rubric_essay_set_2["Writing Applications"]["overall_description"] = "The essay fully accomplishes the task in a thorough and insightful manner and has a distinctive quality that sets it apart as an outstanding performance."
+fine_grained_rubric_essay_set_2["Language Conventions"]["overall_description"] = "The essay the writing sample exhibit a superior command of language skills. The paper provides evidence that the student has a thorough control of the concepts outlined in the Indiana Academic Standards associated with the student's grade level."
+
+
+fine_grained_rubric_essay_set_2_machine = {
+    "Ideas and Content": {
+        "overall_description": "Evaluate whether the writing fully accomplishes the task, presents a unifying theme, stays focused, and includes thorough, relevant, and complete ideas with exceptional supporting details"
+        },
+    "Organization": {
+        "overall_description": "Assess the logical organization of ideas, ensuring the writing presents a cohesive whole with a clear beginning, middle, and end, and includes smooth transitions that enhance the meaning of the text"
+        },
+    "Style": {
+        "overall_description": "Examine the word usage, looking for detailed and precise explanations, rich descriptions, varied vocabulary, and control of challenging vocabulary, as well as the use of varied sentence patterns and literary techniques"
+        },
+    "Voice": {
+        "overall_description": "Determine if the writing demonstrates effective adjustment of language and tone to suit the task and audience, exhibits an appropriate register, and shows a strong sense of audience with an original perspective"
+        },
+    "Language Conventions": {
+        "overall_description": "Check for superior command of language skills, including capitalization, punctuation, spelling, grammar, Standard English usage, paragraphing, and sentence structure, ensuring there are no errors that impair the flow of communication"
+        }
 }
 
 essay_set_2 = {
@@ -549,7 +645,8 @@ essay_set_2 = {
     "prompt": prompt_essay_set_2,
     "scoring_rubric": scoring_rubric_set_2,
     "examples": examples_set_2,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_2
+    "fine_grained_rubric": fine_grained_rubric_essay_set_2,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_2_machine
 }
 
 
@@ -680,17 +777,69 @@ examples_set_3 = [
 ]
 
 fine_grained_rubric_essay_set_3 ={
-    'address_question': {
-        'prompt': "The essay addresses the demands of the question"
+    'address the question': {
+        3: {
+            "description": "Addresses the demands of the question",
+        },
+        2: {
+            "description": "Addresses the demands of the question, although may not develop all parts equally",
+        },
+        1: {
+            "description": "May show evidence that some meaning has been derived from the text"
+        },
+        0: {
+            "description": "The response is completely irrelevant or incorrect, or there is no response.",
+        },
+        "overall_description": "The essay addresses the demands of the question"
     },
-    'implied_info': {
-        'prompt': 'The essay uses expressed and implied information from the text'
+    'uses implied information': {
+        3: {
+            "description": "Uses expressed and implied information from the text"
+        },
+        2: {
+            "description": "Uses some expressed or implied information from the text to demonstrate understanding",
+        },
+        1: {
+            "description": "May indicate a misreading of the text or the question"
+        },
+        0: {
+            "description": "The response is completely irrelevant or incorrect, or there is no response.",
+        },
+        "overall_description": 'The essay uses expressed and implied information from the text'
     },
-    'clarification': {
-        'prompt': "The essay clarifies and extends understanding beyond the literal"
+    'clarification beyond literal': {
+        3: {
+            "description": "Clarifies and extends understanding beyond the literal"
+        },
+        2: {
+            "description": "May not fully connect the support to a conclusion or assertion made about the text(s)",
+        },
+        1: {
+            "description": "May lack information or explanation to support an understanding of the text in relation to the question",
+        },
+        0: {
+            "description": "The response is completely irrelevant or incorrect, or there is no response.",
+        },
+        "overall_description": "The essay clarifies and extends understanding beyond the literal"
     }
 }
+fine_grained_rubric_essay_set_3_machine = {
+    "Understanding of Text Complexities": {"overall_description": "Evaluate whether the response demonstrates a deep comprehension of the text, including its nuances and subtleties"},
 
+    "Addressing the Prompt": {"overall_description": "Check if the response fully addresses the demands of the question, covering all parts of the prompt"},
+
+    "Use of Textual Evidence": {"overall_description": "Look for the use of both expressed and implied information from the text to support the response"},
+
+    "Extension Beyond Literal": {"overall_description": "Assess whether the response goes beyond a literal interpretation to provide deeper insights or connections"},
+
+    "Development of Ideas": {"overall_description": "Determine if the response develops its ideas thoroughly and equally, ensuring all parts of the question are addressed"},
+
+    "Connection of Support to Conclusion": {"overall_description": "Verify that the textual evidence is effectively connected to the conclusions or assertions made in the response"},
+
+    "Accuracy of Interpretation": {"overall_description": "Ensure that the response accurately interprets the text and the question, avoiding any misreadings"},
+
+    "Completeness of Explanation": {"overall_description": "Check for a comprehensive explanation that supports the understanding of the text in relation to the question"},
+}
 essay_set_3 = {
     "number_of_essays": 1726,
     "average_length": 150.0,
@@ -701,7 +850,8 @@ essay_set_3 = {
     "prompt": prompt_essay_set3,
     "scoring_rubric": scoring_rubric_set_3,
     "examples": examples_set_3,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_3
+    "fine_grained_rubric": fine_grained_rubric_essay_set_3,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_3_machine
 }
 
 
@@ -799,17 +949,8 @@ scoring_rubric_set_4 = {
     },
 }
 
-fine_grained_rubric_essay_set_4 ={
-    'address_question': {
-        'prompt': "The essay addresses the demands of the question"
-    },
-    'implied_info': {
-        'prompt': 'The essay uses expressed and implied information from the text'
-    },
-    'clarification': {
-        'prompt': "The essay clarifies and extends understanding beyond the literal"
-    }
-}
+fine_grained_rubric_essay_set_4 = copy.deepcopy(fine_grained_rubric_essay_set_3) # they are exactly the same!
+fine_grained_rubric_essay_set_4_machine = copy.deepcopy(fine_grained_rubric_essay_set_3_machine)
 
 examples_set_4 = [
     {
@@ -874,7 +1015,8 @@ essay_set_4 = {
     "prompt": prompt_essay_set4,
     "scoring_rubric": scoring_rubric_set_4,
     "examples": examples_set_4,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_4
+    "fine_grained_rubric": fine_grained_rubric_essay_set_4,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_4_machine
 }
 
 
@@ -996,19 +1138,95 @@ examples_set_5 = [
     },
 ]
 
-fine_grained_rubric_essay_set_5 ={
+fine_grained_rubric_essay_set_5 = {
     'clarity': {
-        'prompt': "The essay contains a clear description of the mood created by the author"
+        4: {
+            "description": "The response is a clear description of the mood created by the author"
+        },
+        3: {
+            "description": "The response is a mostly clear description of the mood created by the author.",
+        },
+        2: {
+            "description": "The response is a partial description of the mood created by the author.",
+        },
+        1: {
+            "description": "The response is a minimal description of the mood created by the author.",
+        },
+        0: {
+            "description": "The response is unclear to demonstrate comprehension.",
+        },
+        "overall_description": "The essay contains a clear description of the mood created by the author"
     },
     'completeness': {
-        'prompt': 'The essay contains a complete description of the mood created by the author'
+        4: {
+            "description": "The response is a complete description of the mood created by the author",
+        },
+        3: {
+            "description": "The response is a mostly complete description of the mood created by the author.",
+        },
+        2: {
+            "description": "The response is a partial description of the mood created by the author.",
+        },
+        1: {
+            "description": "The response is a minimal description of the mood created by the author.",
+        },
+        0: {
+            "description": "The response is insufficient to demonstrate comprehension.",
+        },
+        "overall_description": 'The essay contains a complete description of the mood created by the author'
     },
     'accurate': {
-        'prompt': "The essay contains an accurate description of the mood created by the author"
+        4: {
+            "description": "The response is an accurate description of the mood created by the author.",
+        },
+        3: {
+            "description": "The response is a mostly accurate description of the mood created by the author.",
+        },
+        2: {
+            "description": "The response is a partial description of the mood created by the author.",
+        },
+        1: {
+            "description": "The response is a minimal description of the mood created by the author.",
+        },
+        0: {
+            "description": "The response is incorrect to demonstrate comprehension.",
+        },
+        "overall_description": "The essay contains an accurate description of the mood created by the author"
     },
     'relevant': {
-        'prompt': 'The essay includes relevant and specific information from the memoir.'
+        4: {
+            "description": "The response includes relevant and specific information from the memoir.",
+        },
+        3: {
+            "description": "The response includes relevant but often general information from the memoir.",
+        },
+        2: {
+            "description": "The response includes limited information from the memoir and may include misinterpretations.",
+        },
+        1: {
+            "description": "The response includes little or no information from the memoir and may include misinterpretations. OR The response relates minimally to the task.",
+        },
+        0: {
+            "description": "The response is irrelevant information to demonstrate comprehension.",
+        },
+        "overall_description": 'The essay includes relevant and specific information from the memoir.'
     }
+}
+
+fine_grained_rubric_essay_set_5_machine = {
+    "Clarity": {"overall_description": "Evaluate whether the response clearly describes the mood created by the author"},
+
+    "Completeness": {"overall_description": "Assess if the response provides a thorough and comprehensive description of the mood"},
+
+    "Accuracy": {"overall_description": "Check if the response accurately reflects the mood as intended by the author in the memoir"},
+
+    "Specificity": {"overall_description": "Look for the inclusion of relevant and specific information from the memoir to support the description of the mood"},
+
+    "Relevance": {"overall_description": "Ensure that the response stays on topic and directly addresses the task of describing the mood"},
+
+    "Interpretation": {"overall_description": "Determine if the response correctly interprets the mood without misrepresentations or misunderstandings"},
+
+    "Detail": {"overall_description": "Examine the level of detail provided in the response, distinguishing between general and specific information"},
 }
 
 essay_set_5 = {
@@ -1021,7 +1239,8 @@ essay_set_5 = {
     "prompt": prompt_essay_set_5,
     "scoring_rubric": scoring_rubric_set_5,
     "examples": examples_set_5,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_5
+    "fine_grained_rubric": fine_grained_rubric_essay_set_5,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_5_machine
 }
 
 
@@ -1152,21 +1371,8 @@ examples_set_6 = [
     },
 ]
 
-fine_grained_rubric_essay_set_6 ={
-    'clarity': {
-        'prompt': "The essay contains a clear description of the obstacles the builders of the Empire State Building faced in attempting to allow dirigibles to dock there."
-    },
-    'completeness': {
-        'prompt': 'The essay contains a complete description of the obstacles the builders of the Empire State Building faced in attempting to allow dirigibles to dock there.'
-    },
-    'accurate': {
-        'prompt': "The essay contains an accurate description of the obstacles the builders of the Empire State Building faced in attempting to allow dirigibles to dock there."
-    },
-    'relevant': {
-        'prompt': 'The essay includes relevant and specific information from the excerpt'
-    }
-}
-
+fine_grained_rubric_essay_set_6 = copy.deepcopy(fine_grained_rubric_essay_set_5) # they are exactly the same!
+fine_grained_rubric_essay_set_6_machine = copy.deepcopy(fine_grained_rubric_essay_set_5_machine)
 essay_set_6 = {
     "number_of_essays": 1800,
     "average_length": 150.0,
@@ -1177,7 +1383,8 @@ essay_set_6 = {
     "prompt": prompt_essay_set_6,
     "scoring_rubric": scoring_rubric_set_6,
     "examples": examples_set_6,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_6
+    "fine_grained_rubric": fine_grained_rubric_essay_set_6,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_6_machine
 }
 
 
@@ -1213,6 +1420,7 @@ scoring_rubric_set_7 = {
             "typical_elements": [],
             "fine_grained_rubric": "",
         },
+        "overall_description": "The essay shows ideas that are clearly focused on the topic and are thoroughly developed with specific, relevant details.",
     },
     "Organization": {
         3: {
@@ -1235,6 +1443,7 @@ scoring_rubric_set_7 = {
             "typical_elements": [],
             "fine_grained_rubric": "",
         },
+        "overall_description": 'The essay shows organization and connections between ideas and/or events are clear and logically sequenced. '
     },
     "Style": {
         3: {
@@ -1257,6 +1466,7 @@ scoring_rubric_set_7 = {
             "typical_elements": [],
             "fine_grained_rubric": "",
         },
+        "overall_description": "The essay shows command of language, including effective and compelling word choice and varied sentence structure, clearly supports the writer's purpose and audience."
     },
     "Conventions": {
         3: {
@@ -1279,6 +1489,7 @@ scoring_rubric_set_7 = {
             "typical_elements": [],
             "fine_grained_rubric": "",
         },
+        "overall_description": 'The essay shows consistent, appropriate use of conventions of Standard English for grammar, usage, spelling, capitalization, and punctuation for the grade level.'
     }
 }
 
@@ -1365,18 +1576,20 @@ examples_set_7 = [
     },
 ]
 
-fine_grained_rubric_essay_set_7 ={
-    'Ideas': {
-        'prompt': "The essay shows ideas that are clearly focused on the topic and are thoroughly developed with specific, relevant details.",
+fine_grained_rubric_essay_set_7 = copy.deepcopy(scoring_rubric_set_7)
+
+fine_grained_rubric_essay_set_7_machine = {
+    "Ideas": {
+        "overall_description": "Evaluate how clearly the story is focused on the topic of patience and how thoroughly it is developed with specific, relevant details"
     },
-    'Organization': {
-        'prompt': 'The essay shows organization and connections between ideas and/or events are clear and logically sequenced. ',
+    "Organization": {
+        "overall_description": "Assess the clarity and logical sequence of the organization and connections between ideas and/or events in the story"
     },
-    'Style': {
-        'prompt': "The essay shows command of language, including effective and compelling word choice and varied sentence structure, clearly supports the writer's purpose and audience.",
+    "Style": {
+        "overall_description": "Examine the command of language, including word choice and sentence structure, to determine how effectively it supports the writer's purpose and audience"
     },
-    'Conventions': {
-        'prompt': 'The essay shows consistent, appropriate use of conventions of Standard English for grammar, usage, spelling, capitalization, and punctuation for the grade level.',
+    "Conventions": {
+        "overall_description": "Check for the consistent and appropriate use of Standard English conventions, including grammar, usage, spelling, capitalization, and punctuation"
     }
 }
 
@@ -1390,7 +1603,8 @@ essay_set_7 = {
     "prompt": prompt_essay_set_7,
     "scoring_rubric": scoring_rubric_set_7,
     "examples": examples_set_7,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_7
+    "fine_grained_rubric": fine_grained_rubric_essay_set_7,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_7_machine
 }
 
 IDEAS_AND_CONTENT = "Ideas and Content"
@@ -1906,25 +2120,38 @@ CONVENTIONS = "Conventions"
 VOICE = "Voice"
 WORD_CHOICE = "Word Choice"
 
-fine_grained_rubric_essay_set_8 ={
-    IDEAS_AND_CONTENT: {
-        'prompt': "The writing is clear, focused, and interesting. Main ideas stand out and are developed by strong support and rich details suitable to audience and purpose",
+fine_grained_rubric_essay_set_8 = copy.deepcopy(scoring_rubric_set_8)
+fine_grained_rubric_essay_set_8[IDEAS_AND_CONTENT]["overall_description"] = "The writing is clear, focused, and interesting. Main ideas stand out and are developed by strong support and rich details suitable to audience and purpose"
+fine_grained_rubric_essay_set_8[ORGANIZATION]["overall_description"] = 'The organization enhances the central idea(s) and its development. The order and structure are compelling and move the reader through the text easily.'
+fine_grained_rubric_essay_set_8[SENTENCE_FLUENCY]["overall_description"] = 'The writing has an effective flow and rhythm. Sentences show a high degree of craftsmanship, with consistently strong and varied structure that makes expressive oral reading easy and enjoyable.'
+fine_grained_rubric_essay_set_8[CONVENTIONS]["overall_description"] = 'The writing demonstrates exceptionally strong control of standard writing conventions (e.g., punctuation, spelling, capitalization, grammar and usage) and uses them effectively to enhance communication. Errors are so few and so minor that the reader can easily skim right over them unless specifically searching for them.'
+fine_grained_rubric_essay_set_8[VOICE]["overall_description"] = 'The writer has chosen a voice appropriate for the topic, purpose, and audience. The writer demonstrates deep commitment to the topic, and there is an exceptional sense of “writing to be read.” The writing is expressive, engaging, or sincere.'
+fine_grained_rubric_essay_set_8[WORD_CHOICE]["overall_description"] = "Words convey the intended message in an exceptionally interesting, precise, and natural way appropriate to audience and purpose. The writer employs a rich, broad range of words which have been carefully chosen and thoughtfully placed for impact."
+
+fine_grained_rubric_essay_set_8_machine = {
+    "Ideas and Content": {
+        "overall_description": "Evaluate the clarity, focus, and depth of the main ideas and supporting details, ensuring they are well-developed and suitable for the audience and purpose"
     },
-    ORGANIZATION: {
-        'prompt': 'The organization enhances the central idea(s) and its development. The order and structure are compelling and move the reader through the text easily.',
+
+    "Organization": {
+        "overall_description": "Assess the effectiveness of the structure, including the sequencing of ideas, paragraph breaks, transitions, and the presence of a strong beginning and conclusion"
     },
-    SENTENCE_FLUENCY: {
-        'prompt': 'The writing has an effective flow and rhythm. Sentences show a high degree of craftsmanship, with consistently strong and varied structure that makes expressive oral reading easy and enjoyable.'
+
+    "Voice": {
+        "overall_description": "Determine the appropriateness and engagement of the writer's voice, ensuring it suits the topic, purpose, and audience, and conveys a sense of commitment and interaction"
     },
-    CONVENTIONS: {
-        'prompt': 'The writing demonstrates exceptionally strong control of standard writing conventions (e.g., punctuation, spelling, capitalization, grammar and usage) and uses them effectively to enhance communication. Errors are so few and so minor that the reader can easily skim right over them unless specifically searching for them.',
+
+    "Word Choice": {
+        "overall_description": "Examine the precision, variety, and impact of the vocabulary used, ensuring words are carefully chosen to convey the intended message effectively and vividly"
     },
-    VOICE: {
-        'prompt': 'The writer has chosen a voice appropriate for the topic, purpose, and audience. The writer demonstrates deep commitment to the topic, and there is an exceptional sense of “writing to be read.” The writing is expressive, engaging, or sincere.'
+
+    "Sentence Fluency": {
+        "overall_description": "Evaluate the flow and rhythm of the writing, looking for varied and well-crafted sentence structures that enhance readability and meaning"
     },
-    WORD_CHOICE: {
-        'prompt': "Words convey the intended message in an exceptionally interesting, precise, and natural way appropriate to audience and purpose. The writer employs a rich, broad range of words which have been carefully chosen and thoughtfully placed for impact.",
-    }
+
+    "Conventions": {
+        "overall_description": "Check for control over standard writing conventions such as punctuation, spelling, capitalization, grammar, and usage, ensuring they enhance readability and communication"
+    },
 }
 
 essay_set_8 = {
@@ -1937,7 +2164,8 @@ essay_set_8 = {
     "prompt": prompt_essay_set_8,
     "scoring_rubric": scoring_rubric_set_8,
     "examples": examples_set_8,
-    "fine_grained_rubric": fine_grained_rubric_essay_set_8
+    "fine_grained_rubric": fine_grained_rubric_essay_set_8,
+    "fine_grained_rubric_machine": fine_grained_rubric_essay_set_8_machine
 }
 
 essay_set_descriptions = [essay_set_1, essay_set_2, essay_set_3, essay_set_4, essay_set_5, essay_set_6, essay_set_7,

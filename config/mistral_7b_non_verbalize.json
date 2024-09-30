@@ -1,0 +1,40 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "mistral_fg_v0_5/non_verbalize_exp_tmp1",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 1,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_fg_v0_5/non_verbalize_exp_tmp2",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 2,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_fg_v0_5/non_verbalize_exp_tmp3",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_fg_v0_5/non_verbalize_exp_tmp4",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 4,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        }
+    ]
+}
