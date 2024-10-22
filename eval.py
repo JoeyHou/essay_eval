@@ -4,6 +4,7 @@ import argparse
 import json 
 import re
 import pickle
+import readability
 from tqdm import tqdm 
 
 # importing module
@@ -21,6 +22,10 @@ logger.setLevel(logging.INFO)
 # logger.error("Did you try to divide by zero")
 # logger.critical("Internet is down")
 
+import nltk
+nltk.download('punkt')
+nltk.download('punkt_tab')
+from nltk.tokenize import sent_tokenize
 
 ## local modules ##
 import sys
@@ -198,8 +203,13 @@ class FineGrainEvaluator():
         else:
             for criteria in meta_data["scoring_rubric"]:
                 rubric_small += f"Scoring rubric for '{criteria}':\n"
+                # print('meta_data["scoring_rubric"]:', meta_data["scoring_rubric"])
                 for points in meta_data["scoring_rubric"][criteria]:
-                    description = meta_data["scoring_rubric"][criteria][points]['description']
+                    try:
+                        description = meta_data["scoring_rubric"][criteria][points]['description']
+                    except:
+                        description = ''
+                        print('[ERROR] meta_data["scoring_rubric"][criteria]:', meta_data["scoring_rubric"][criteria])
                     rubric_small += f"{points} points: {description}\n"
             return rubric_small, rubric_overall_description
     
@@ -344,6 +354,16 @@ class FineGrainEvaluator():
             # raise NotImplementedError
             model_prefix=""
             model_suffix=""
+        
+        ling_feature_data = {}
+        use_ling_feature = False
+        if self.args.ling_features != []:
+            try:
+                ling_feature_data = pd.read_csv('./data/asap/hand_crafted_cleaned.csv')
+                ling_feature_data.index = ling_feature_data['item_id'] # use essay id as the index 
+                use_ling_feature = True
+            except:
+                print('[ERROR] Failed to load linguistic features!')
 
         for i in range(len(essay_batch)):
             essay, essay_id, essay_set = essay_batch[i]
@@ -394,6 +414,24 @@ class FineGrainEvaluator():
                         scoring_range = scoring_range,
                         rubric = overall_description
                     )
+                additional_information = ''
+
+                if use_ling_feature:
+                    additional_information = '### Additional Information:\n'
+                    # readability_results = readability.getmeasures(essay, lang='en')
+                    for ling_feature in self.args.ling_features:
+                        if ling_feature in ling_feature_data.columns:
+                            tmp_ling_feature = round(ling_feature_data.loc[essay_id][ling_feature], 2) # round to 2nd 
+                            group_median = round(ling_feature_data.loc[essay_id][ling_feature + '_median'], 2)
+                        else:
+                            continue
+
+                        additional_information += '- {}: {} (median: {})\n'.format(
+                            ling_feature,
+                            tmp_ling_feature,
+                            group_median
+                        )
+                        
                 # print('tmp_analysis_instruction:', tmp_analysis_instruction)
                 tmp_format_instruction = self.format_instruction.replace('{score_format}', score_format)
                 llm_prompt = make_prompt(
@@ -404,7 +442,8 @@ class FineGrainEvaluator():
                         'analysis_instruction': tmp_analysis_instruction, 
                         'format_instruction': tmp_format_instruction,
                         'model_prefix': model_prefix, 
-                        'model_suffix': model_suffix
+                        'model_suffix': model_suffix,
+                        'additional_information': additional_information
                     }
                 )
                 all_prompts.append(llm_prompt)
@@ -543,10 +582,11 @@ if __name__ == '__main__':
     #   Others have different ideas. Some experts are concerned that people are spending too much time on their computers and less time exercising, enjoying nature, and interacting with family and friends. \n\nWrite a letter to your local newspaper in which you state your opinion on the effects computers have on people. Persuade the readers to agree with you.\n'''\n\n#### Analyzed Student Essay:\n'''Dear local newspaper, I think effects computers have on people are great learning skills/affects because they give us time to chat with friends/new people, helps us learn about the globe(astronomy) and keeps us out of troble! Thing about! Dont you think so? How would you feel if your teenager is always on the phone with friends! Do you ever time to chat with your friends or buisness partner about things. Well now - there's a new way to chat the computer, theirs plenty of sites on the internet to do so: @ORGANIZATION1, @ORGANIZATION2, @CAPS1, facebook, myspace ect. Just think now while your setting up meeting with your boss on the computer, your teenager is having fun on the phone not rushing to get off cause you want to use it. How did you learn about other countrys/states outside of yours? Well I have by computer/internet, it's a new way to learn about what going on in our time! You might think your child spends a lot of time on the computer, but ask them so question about the economy, sea floor spreading or even about the @DATE1's you'll be surprise at how much he/she knows. Believe it or not the computer is much interesting then in class all day reading out of books. If your child is home on your computer or at a local library, it's better than being out with friends being fresh, or being perpressured to doing something they know isnt right. You might not know where your child is, @CAPS2 forbidde in a hospital bed because of a drive-by. Rather than your child on the computer learning, chatting or just playing games, safe and sound in your home or community place. Now I hope you have reached a point to understand and agree with me, because computers can have great effects on you or child because it gives us time to chat with friends/new people, helps us learn about the globe and believe or not keeps us out of troble. Thank you for listening.'''\n\n### Analysis Task:\n- Rate this essay in the following aspect: {'prompt': 'The essay has fully elaborated reasons with specific details.'}(The essay has fully elaborated reasons with specific details.), with 1 being worst and 6 being good.\n- Give the result in the following format: \n    - Score: \n    - Explanation: \n    - Edit suggestions:\n"""
     # prompt = """hello, what is your name?"""
     
-    # vllm = VLLM(model="meta-llama/Meta-Llama-3.1-8B-Instruct", max_length=4096, temperature=0.01)
+    # # vllm = VLLM(model="meta-llama/Meta-Llama-3.1-8B-Instruct", max_length=4096, temperature=0.01)
+    # # vllm = VLLM(model="meta-llama/Llama-3.1-8B-Instruct", max_length=4096, temperature=0.01)
     
-    # vllm = VLLM(model="mistralai/Mistral-7B-Instruct-v0.2", max_length=4096, temperature=0.01)
-    # vllm = VLLM(model="meta-llama/Meta-Llama-3-8B-Instruct", max_length=4096, temperature=0.01)
+    # vllm = VLLM(model="mistralai/Mistral-7B-Instruct-v0.2", max_length=4096, temperature=0.01) ## current version
+    # # vllm = VLLM(model="meta-llama/Meta-Llama-3-8B-Instruct", max_length=4096, temperature=0.01) ## current version
     # llm_output = vllm.batch([prompt])
     # print(llm_output)
     # exit(0)
@@ -577,6 +617,7 @@ if __name__ == '__main__':
     # parser.add_argument("--prompt", type=str, default="holistic_scoring_prompt1")
     parser.add_argument("--prompt_template", type=int, default=3, choices=[1, 2, 3, 4, 5])
     parser.add_argument("--analysis_instruction", type=str, default="simple")
+    parser.add_argument("--ling_features", type=list, default=[])
     # parser.add_argument("--setting", type=str, default="one-shot", choices=["one-shot", "few-shot"])
     # parser.add_argument("--full-rubric", action="store_true")
     # parser.add_argument("--instruction-variant", type=int, default=1, choices=[1, 2, 3, 4])

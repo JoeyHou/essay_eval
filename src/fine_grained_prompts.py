@@ -169,6 +169,9 @@ You are part of an educational research team analyzing the writing skills of stu
 ### Analyzed Student Essay:
 '''{essay}'''
 
+{additional_information}
+
+### Analysis
 Conclude your analysis with a grade and comments in the following format:
 {format_instruction}
 
