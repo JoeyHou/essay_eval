@@ -155,7 +155,7 @@ class FeatureSet:
             self.readability_measures,
         ]
 
-        for i, func in enumerate(tqdm(func, desc="Running all feature generation methods...")):
+        for i, func in enumerate(tqdm(funcs, desc="Running all feature generation methods...")):
 
             if i == len(funcs) - 1:
                 func(args)
