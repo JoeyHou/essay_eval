@@ -2,6 +2,7 @@
 # Created by Alejandro Ciuba, alc307@pitt.edu
 # Code based on https://github.com/robert1ridley/cross-prompt-trait-scoring/blob/main/features.py
 from collections import Counter
+from tqdm import tqdm
 
 import nltk
 import readability
@@ -145,12 +146,21 @@ class FeatureSet:
         Calculate all features.
         """
     
-        self.hapax()
-        self.word_count()
-        self.sentence_count()
-        self.ess_char_len()
-        self.spacy_measures()
-        self.readability_measures(args)
+        funcs = [
+            self.hapax,
+            self.word_count,
+            self.sentence_count,
+            self.ess_char_len,
+            self.spacy_measures,
+            self.readability_measures,
+        ]
+
+        for i, func in enumerate(tqdm(func, desc="Running all feature generation methods...")):
+
+            if i == len(funcs) - 1:
+                func(args)
+            else:
+                func()
 
 
 if __name__ == "__main__":
