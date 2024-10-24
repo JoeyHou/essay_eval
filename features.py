@@ -158,7 +158,7 @@ class FeatureSet:
         for i, func in enumerate(tqdm(funcs, desc="Running all feature generation methods...")):
 
             if i == len(funcs) - 1:
-                func(args)
+                func(args[0])
             else:
                 func()
 
