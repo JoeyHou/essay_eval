@@ -12,6 +12,7 @@ import string
 
 import pandas as pd
 
+
 NLP: spacy.Language = spacy.load("en_core_web_sm")
 
 # NO LOWERCASE NORMALIZATION PERFORMED
@@ -46,13 +47,13 @@ class FeatureSet:
         Returns
         ---
 
-        The number of hapax legomena in all essays under `HAPAX` or `col_name`. 
+        The number of hapax legomena in all essays under `HAPAX` or `col_name`.
         """
-        
+
         # TODO: Needs to be tested
         def hapax(bow: list[str]) -> int:
             return len(list(filter(lambda x: True if col[x] == 1 else False, col := Counter(bow))))
-        
+
         self.df[col_name] = self.df[self.token_col].map(hapax)
 
     def ess_char_len(self, col_name: str = "ESS_CHAR_LEN"):
@@ -61,7 +62,7 @@ class FeatureSet:
 
         Returns
         ---
-        
+
         The number of non-space, non-punctuation characters in all essays under `HAPAX` or `col_name`.
         """
         self.df[col_name] = self.df[self.token_col].map(lambda x: Counter(x).total())
@@ -113,12 +114,12 @@ class FeatureSet:
             stop_word_count = len(set([token.text for token in doc if token.is_stop]))
 
             return [lemma_count, noun_count, stop_word_count]
-        
+
         columns = ["LEMMA_COUNT", "NOUN_COUNT", "STOP_WORD_COUNT"]
         self.df[columns] = pd.DataFrame(self.df[self.essay_col].map(lambda x: get_measures(x)).to_list())
 
 
-    def readability_measures(self, 
+    def readability_measures(self,
                              feats: dict[str, str] | list[str] = ['complex_words_dc',
                                                                   'characters',
                                                                   'long_words',
@@ -145,7 +146,7 @@ class FeatureSet:
         """
         Calculate all features.
         """
-    
+
         funcs = [
             self.hapax,
             self.word_count,

@@ -18,7 +18,7 @@ def main(args: argparse.Namespace):
         'characters',
         'long_words',
         ])
-    
+
     df = feats.df.drop(columns=["TOKENS"])
     df.to_csv(args.save)
 
