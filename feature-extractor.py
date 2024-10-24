@@ -19,7 +19,8 @@ def main(args: argparse.Namespace):
         'long_words',
         ])
     
-    feats.df.to_csv(args.save)
+    df = feats.df.drop(columns=["TOKENS"])
+    df.to_csv(args.save)
 
 def add_args(parser: argparse.ArgumentParser):
 
