@@ -42,7 +42,7 @@ analysis_instruction_feedback_fg = """Grade the given essay using the following 
 format_instruction_feedbacks = '''
 ### Feedbacks: 
 ### Score: 
-### '''
+'''
 # ###
 # {
 #     "Feedbacks": "",
@@ -71,7 +71,7 @@ analysis_instruction_explanation_fg = """Grade the given essay with the followin
 format_instruction_score_and_analysis = """
 ### Explanation: 
 ### Score: 
-###"""
+"""
 
 # format_instruction_score_and_analysis = '''
 # ###
@@ -103,9 +103,9 @@ analysis_instruction_comprehensive_fg = """Analyze the given essay using the fol
 
 format_instruction_all = '''
 ### Explanation: 
-### Score: 
 ### Feedbacks: 
-### '''
+### Score: 
+'''
 # ###
 # {
 #     "Explanation": "",
