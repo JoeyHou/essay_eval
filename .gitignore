@@ -8,8 +8,12 @@ archived/*
 log.json
 raw_log_data.json
 run_multiple.sh
-
 run_eval.py
+run_original.py
+run.sh 
+tmp_qwk.py
+
+dev_joey.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
