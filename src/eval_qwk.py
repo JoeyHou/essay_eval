@@ -178,7 +178,8 @@ def evaluation(
             for score in qwks
         ]
 
-        qwk_avg = np.mean([qwk for qwk in qwks if qwk != -1])
+        # qwk_avg = np.mean([qwk for qwk in qwks if qwk != -1])
+        qwk_avg = np.nanmean([qwk for qwk in qwks if qwk != -1])
         # print(qwks)
         # save the results in a pandas dataframe
         new_df_entry = {}
@@ -201,8 +202,8 @@ def evaluation(
     # print(df_data)
     # if 'prompt' in df_data
     df_data['prompt_group'] = df_data['prompt'].apply(lambda x: x if '_var' not in x else '_'.join(x.split('_')[:-1]) )
-    result_df = df_data.drop(columns = ["template", "variant", "prompt", "Incorrect Predictions"]).groupby('prompt_group').agg('mean')#.reset_index(drop = True)
-    # result_df.to_csv(output_data_path)
+    result_df = df_data.drop(columns = ["template", "variant", "prompt", "Incorrect Predictions"]).groupby('prompt_group').agg('mean')
+    
     return result_df
 
 if __name__ == '__main__':
