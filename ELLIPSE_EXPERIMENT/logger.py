@@ -1,12 +1,13 @@
 # Generic logging setup
 # Created by Alejandro Ciuba, alc307@pitt.edu
 from pathlib import Path
+from typing import Union
 
 import logging
 
-StrPath = str | Path
+StrPath = Union[str, Path]
 
-def make_loggers(*args: StrPath, levels: list[int] | int) \
+def make_loggers(*args: StrPath, levels: Union[list[int], int]) \
     -> tuple[logging.Logger]:
 
     def make_logger(path, level, i) -> logging.Logger:

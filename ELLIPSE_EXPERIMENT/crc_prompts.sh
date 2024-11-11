@@ -5,7 +5,7 @@
 
 ############## SBATCH HEADER BEGIN ##############
 #SBATCH --job-name=ELLIPSE-MISTRAL
-#SBATCH --output=output/%x.out
+#SBATCH --output=output/%x-%A.out
 #SBATCH --mail-user=alc307@pitt.edu
 #SBATCH --mail-type=END
 #SBATCH --mail-type=FAIL
@@ -32,11 +32,15 @@ unset PYTHONPATH
 
 echo "RUN: `date`"
 
-DIRECTORY=data/ELLIPSE/
-DATA=ELLIPSE_Final_github.csv
+DIRECTORY=data/
+DATA=ELLIPSE_ling_feats.csv
 RUBRIC=rubric.json
+HF_TOKEN=/ihome/dvillarreal/alc307/ix/tokens/hugging_face.json
+HF_HOME=/ihome/dvillarreal/alc307/ix/ix_models/hugging_face/
 
 python prompt-llms.py \
     -m mistralai/Mistral-7B-Instruct-v0.2 \
     -d $DIRECTORY$DATA $DIRECTORY$RUBRIC \
-    -l logs/log1.log debug/debug1.log errors/err1.log
+    -l logs/log2.log debug/debug2.log errors/err2.log \
+    -t $HF_TOKEN \
+    -hf $HF_HOME \

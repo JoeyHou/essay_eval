@@ -1,0 +1,24 @@
+RUN: Thu Nov 7 16:36:53 EST 2024
+RUN: Thu Nov  7 16:36:58 EST 2024
+/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/connections.py:8: RuntimeWarning: Failed to read commit hash:
+No module named 'vllm._version'
+  from vllm.version import __version__ as VLLM_VERSION
+<Logger log-0 (INFO)> <Logger log-1 (DEBUG)> <Logger log-2 (WARNING)>
+Traceback (most recent call last):
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 97, in <module>
+    main(args)
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 29, in main
+    test_df = pd.read_csv(args.data[0])
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/site-packages/pandas/util/_decorators.py", line 311, in wrapper
+    return func(*args, **kwargs)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 678, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 575, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 932, in __init__
+    self._engine = self._make_engine(f, self.engine)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/site-packages/pandas/io/parsers/readers.py", line 1216, in _make_engine
+    self.handles = get_handle(  # type: ignore[call-overload]
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/site-packages/pandas/io/common.py", line 786, in get_handle
+    handle = open(
+FileNotFoundError: [Errno 2] No such file or directory: 'data/ELLIPSE/ELLIPSE_Final_github.csv'

@@ -2,6 +2,7 @@
 # Modified by Alejandro Ciuba
 from pathlib import Path
 from langchain.prompts import PromptTemplate
+from typing import Union
 
 import json
 
@@ -57,7 +58,45 @@ def make_prompt(**kwargs) -> PromptTemplate:
     prompt = PromptTemplate.from_template(template=prompt_template_1)
     return prompt.partial(**kwargs, analysis_instruction=ai, format_instruction=fi)
 
-def make_rubric(file: Path | str) -> str:
+
+def batch_prompts(format=True, **kwargs) -> PromptTemplate:
+    """
+    Batch make a series of prompts.
+
+    Parameters
+    ---
+
+    format: `bool`
+        Automatically format the prompts before yielding them; useful for lists. Defaults to `True`.
+
+    essays: `Iterable[str]`
+        The student essay texts.
+
+    prompts: `Iterable[str]`
+        The prompts associated with the essay texts.
+
+    rubric: `str`
+        The scoring rubric for the essay.
+
+    range: `tuple[int, int]`
+        The minimum and maximum range scores can take.
+    """
+
+    for prompt, essay in zip(kwargs["essay_prompts"], kwargs["essays"]):
+
+        output = make_prompt(
+            rubric=kwargs['rubric'], 
+            scoring_range=kwargs['scoring_range'],
+            essay_prompt=prompt,
+            essay=essay,
+            model_prefix=kwargs['model_prefix'], 
+            model_suffix=kwargs['model_suffix'],
+        )
+
+        yield output.format() if format else output
+
+
+def make_rubric(file: Union[Path, str]) -> str:
     """
     file: `pathlib.Path | str`
         Filepath to the `JSON` containing the rubric.

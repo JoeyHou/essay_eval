@@ -1,0 +1,14 @@
+RUN: Thu Nov 7 17:02:38 EST 2024
+RUN: Thu Nov  7 17:02:40 EST 2024
+/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/connections.py:8: RuntimeWarning: Failed to read commit hash:
+No module named 'vllm._version'
+  from vllm.version import __version__ as VLLM_VERSION
+<Logger log-0 (INFO)> <Logger log-1 (DEBUG)> <Logger log-2 (WARNING)>
+Traceback (most recent call last):
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 97, in <module>
+    main(args)
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 30, in main
+    rubric = make_rubric(args.data[1])
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompts.py", line 67, in make_rubric
+    with open(file, 'r') as src:
+FileNotFoundError: [Errno 2] No such file or directory: 'data/rubric.json'
