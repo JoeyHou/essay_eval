@@ -26,6 +26,13 @@ def load_asap_id(id_dir, split = 'train'):
             id_lst.append(int(line.strip()))
     return id_lst
 
+def minmax_normalize(data):
+    if max(data) == min(data):
+        return [1.0] * len(data)
+    d_max = max(data)
+    d_min = min(data)
+    return [round((d - d_min) / (d_max - d_min), 2) for d in data]
+
 if __name__ == '__main__':
     ## Load data ## 
     asap_data_dir = './data/asap/'
@@ -47,6 +54,7 @@ if __name__ == '__main__':
     # load existing linguistic features
     existing_hand_crafted = pd.read_csv('data/asap/hand_crafted_v3.csv') ## TODO: change to allow user input
     existing_hand_crafted.index = existing_hand_crafted['item_id']
+    score_dict = existing_hand_crafted['score']
 
     # feature to be computed
     features = {
@@ -95,8 +103,19 @@ if __name__ == '__main__':
     group_median = asap_data_all[['essay_set'] + processed_feat].groupby('essay_set').agg('median')
     
     for feat in processed_feat:
+        asap_data_all[feat + '_norm'] = minmax_normalize(asap_data_all[feat].values)
+    processed_feat_norm = [feat + '_norm' for feat in processed_feat]
+
+    for feat in processed_feat:
         asap_data_all[feat + '_median'] = asap_data_all['essay_set'].apply(lambda x: group_median.loc[x][feat])
     processed_feat_medians = [feat + '_median' for feat in processed_feat]
-    asap_data_all[['essay_set', 'essay_id'] + processed_feat + processed_feat_medians].to_csv('data/asap/hand_crafted_cleaned.csv', index = False)
+
+    asap_data_all['overall_score'] = asap_data_all.essay_id.apply(lambda x: score_dict[x])
+    asap_data_all[
+        ['essay_set', 'essay_id', 'overall_score'] + \
+        processed_feat + \
+        processed_feat_medians + \
+        processed_feat_norm
+    ].to_csv('data/asap/hand_crafted_cleaned.csv', index = False)
 
 
