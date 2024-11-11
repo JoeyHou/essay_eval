@@ -10,9 +10,9 @@ from tqdm import tqdm
 # importing module
 import logging
 logging.basicConfig(
-    filename="log/config.history.log",
+    filename="log/history.log",
     format='%(asctime)s %(message)s',                    
-    filemode='w'
+    filemode='a'
 )
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -58,7 +58,13 @@ from fine_grained_prompts import (
     format_instruction_all,
     format_instruction_score_only,
     format_instruction_score_and_analysis,
-    format_instruction_feedbacks
+    format_instruction_feedbacks,
+    parsing_prompt_holistic,
+    parsing_prompt_fine_grained
+    # parsing_prompt_score_only,
+    # parsing_prompt_feedbacks,
+    # parsing_prompt_score_and_analysis,
+    # parsing_prompt_score_all
 )
 from eval_qwk import evaluation
 # from langchain.output_parsers import StructuredOutputParser, ResponseSchema
@@ -103,8 +109,6 @@ def load_llama_vllm(model, max_length=4096, temperature=0.01):
     elif model == 'llama31':
         return VLLM(model="meta-llama/Meta-Llama-3.1-8B-Instruct", max_length=max_length, temperature=temperature)
 
-
-    
 def load_mistral_vllm(max_length=4096, temperature=0.01):
     """
     Load a Mistral model with specified parameters.
@@ -118,13 +122,43 @@ def load_mistral_vllm(max_length=4096, temperature=0.01):
     """
     return VLLM(model="mistralai/Mistral-7B-Instruct-v0.2", max_length=max_length, temperature=temperature)
 
+def parse_json(json_str):
+    json_str = json_str.replace('\n', '')
+    
+    # find start
+    start = json_str.index('{') if '{' in json_str else 0
+    json_str = json_str[start:]
+
+    # find end
+    end_counter = 0
+    end = 0
+    for i in range(len(json_str)):
+        if json_str[i] == '}':
+            end_counter += 1
+        if end_counter == 2:
+            end = i + 1
+            break 
+
+    # tmp_str = json_str
+    # # end = 0
+    # first_end = tmp_str.index('}')
+    # second_end = tmp_str[first_end:].index('}')
+    # end = first_end + second_end + 2 + 1
+
+    json_str = json_str[:end]
+    try:
+        return json.loads(json_str)
+    except:
+        logger.info('=================\n[ERROR] parsing_output cannot be parsed by json:\n' + json_str)
+        return {}
+
 ## FineGrainEvaluator ##
 class FineGrainEvaluator():
 
     def __init__(self, args):
         self.essay_meta_data = essay_set_descriptions
         self.args = args
-        if not args.skip_llm:
+        if not args.skip_llm and not args.test_prompt:
             if args.model == 'mistral':
                 self.llm = load_mistral_vllm()
             elif 'llama' in args.model:
@@ -164,18 +198,26 @@ class FineGrainEvaluator():
         else:
             self.fine_grained_rubric_key = "fine_grained_rubric"
         self.verbalize = args.verbalize
+        
+        self.parsing_prompt_fg = parsing_prompt_fine_grained
+        self.parsing_prompt_holistic = parsing_prompt_holistic
+        
         if args.analysis_instruction == "simple":
             self.analysis_instruction = analysis_instruction_simple_fg if self.fine_grained else analysis_instruction_simple_holistic
             self.format_instruction = format_instruction_score_only
+            # self.parsing_prompt_template = parsing_prompt_score_only
         elif args.analysis_instruction == "feedback":
             self.analysis_instruction = analysis_instruction_feedback_fg if self.fine_grained else analysis_instruction_feedback_holistic
             self.format_instruction = format_instruction_feedbacks
+            # self.parsing_prompt_template = parsing_prompt_feedbacks
         elif args.analysis_instruction == "explanation":
             self.analysis_instruction = analysis_instruction_explanation_fg if self.fine_grained else analysis_instruction_explanation_holistic
             self.format_instruction = format_instruction_score_and_analysis
+            # self.parsing_prompt_template = parsing_prompt_score_and_analysis
         elif args.analysis_instruction == "all":
             self.analysis_instruction = analysis_instruction_comprehensive_fg if self.fine_grained else analysis_instruction_comprehensive_holistic
             self.format_instruction = format_instruction_all
+            # self.parsing_prompt_template = parsing_prompt_score_all
         else:
             raise NotImplementedError
 
@@ -203,13 +245,9 @@ class FineGrainEvaluator():
         else:
             for criteria in meta_data["scoring_rubric"]:
                 rubric_small += f"Scoring rubric for '{criteria}':\n"
-                # print('meta_data["scoring_rubric"]:', meta_data["scoring_rubric"])
                 for points in meta_data["scoring_rubric"][criteria]:
-                    try:
-                        description = meta_data["scoring_rubric"][criteria][points]['description']
-                    except:
-                        description = ''
-                        print('[ERROR] meta_data["scoring_rubric"][criteria]:', meta_data["scoring_rubric"][criteria])
+                    if points == "overall_description": continue 
+                    description = meta_data["scoring_rubric"][criteria][points]['description']
                     rubric_small += f"{points} points: {description}\n"
             return rubric_small, rubric_overall_description
     
@@ -241,23 +279,7 @@ class FineGrainEvaluator():
             llm_output = self.llm.batch(inputs)
         return llm_output
 
-    def parse_llm_output(self, llm_output, trait = "Overall"):
-        # tmp_out = llm_output.strip()
-        # start_idx = tmp_out.find('{')
-        # end_idx = tmp_out.rfind('}')
-        # tmp_out = tmp_out[start_idx: end_idx + 1]
-        # try:
-        #     out_json = json.loads(tmp_out, strict = False)
-        #     out_json["Stats"] = 1
-        # except:
-        #     out_json = {
-        #         "Score": {self.hard_code_holistic_prompt_key: -1},
-        #         "Explanation": "",
-        #         "Feedbacks": "",
-        #         "Stats": 0
-        #     }
-        # return out_json
-        # print(re.search('### Score: {0,1}\d', llm_output, re.DOTALL))
+    def parse_output_via_re(self, llm_output, trait = "Overall"):
         try:
             score = float(re.search('### Score: {0,1}\d', llm_output, re.DOTALL).group(0).replace("### Score:", "").strip())
             parsed_score = True
@@ -279,59 +301,47 @@ class FineGrainEvaluator():
             "Feedbacks": feedbacks,
             "Stats": (parsed_score, parsed_explanation)
         }
-        # print("llm_output", llm_output)
-        # print("result", result)
         
         return result
-        # llm_output = llm_output.replace('\n', '').strip()
-        # print('---------------\n\n', llm_output,'\n------', re.search('### score:.+\{.+\}', llm_output), '\n-----------')
-        # try:
-        #     score = float(re.search('### score:.+\{.+\}', llm_output)\
-        #                   .group(0).replace('### score:', '').strip())
-        #     parsed_score = True
-        # except:
-        #     score = -1
-        #     parsed_score = False
-        # score = float(re.search('### score:.+\{.+\}', llm_output)\
-        #                   .group(0).replace('### score:', '').strip())
-        # score = re.search('### score \(json format\):.+\{.+\}', llm_output)
-        # if score:
-        #     score = float(score.group(0).replace('### score:', '').strip())
-        # else:
-        #     score = -1 
-        # parsed_score = True
-
-        # score = float(re.search('### score:.+\d+', llm_output)\
-        #                   .group(0).replace('### score:', '').strip())
-        # parsed_score = True
+    
+    def parse_output_via_prompting(self, raw_log_data):
+        # print('self.parsing_prompt_template:', self.parsing_prompt_template)
+        self.parsing_sep = '\n########\n'
+        parsing_inputs = []
+        parsed_llm_outputs = {} # {fold: {...}}
+        for fold in raw_log_data:
+            parsed_llm_outputs[fold] = {} # {essay_id: {prompt_key: parsed_result}}
+            for dp in raw_log_data[fold]:
+                # print("{'llm_output': dp['output']}", {'llm_output': dp['output']})
+                parsing_input_dp = self.parsing_sep.join([
+                    fold, 
+                    str(dp['id']), 
+                    dp['prompt_key'],
+                    self.parsing_prompt_holistic.replace('###LLM_OUTPUT', dp['output'])
+                ])
+                if self.fine_grained:
+                    parsing_input_dp.replace('### Score:', '### Score: -{}'.format(dp['prompt_key']))
+                parsing_inputs.append(parsing_input_dp)
+                
+        if 'gpt' in self.model:
+            raise NotImplementedError # pass 
+        else:
+            cleaned_output = self.llm.batch(parsing_inputs)
         
-        # try:
-        #     explanation = re.search('### explanation:.+###', llm_output, re.DOTALL)
-        #     if explanation is not None:
-        #         explanation = explanation.group(0).replace('### explanation:', '').replace('###', '').strip()
-        #         parsed_exp = True
-        #     else:
-        #         explanation = re.search('### explanation:.+', llm_output, re.DOTALL)
-        #         explanation = explanation.group(0).replace('### explanation:', '').strip()
-        #         parsed_exp = True
-        # except:
-        #     explanation = 'n/a'
-        #     parsed_exp = False
-        
-        # try:
-        #     feedbacks = re.search('### feedbacks:.+', llm_output, re.DOTALL)\
-        #         .group(0).replace('### feedbacks:', '').strip()
-        #     parsed_sug = True
-        # except:
-        #     feedbacks = 'n/a'
-        #     parsed_sug = False
-        # return {
-        #     'score': score,
-        #     'explanation': explanation,
-        #     'feedbacks': feedbacks,
-        #     'stats': (parsed_score, parsed_exp, parsed_sug)
-        # }
-
+        first_dp_per_fold = {fold: True for fold in raw_log_data}
+        for i in range(len(parsing_inputs)):
+            parsing_output = cleaned_output[i].replace('"""', '').strip()
+            parsing_output = parse_json(parsing_output)
+            parsing_intput = parsing_inputs[i]
+            fold, essay_id, prompt_key, _ = parsing_intput.split(self.parsing_sep)
+            parsed_llm_outputs[fold][(essay_id, prompt_key)] = parsing_output
+            # if first_dp_per_fold[fold]:
+            #     logger.info('\n[parse_output_via_prompting] =================')
+            #     logger.info('fold: {}, essay_id: {}, prompt_key: {}, parsing_intput: {}, parsing_output: {}'.format(
+            #         fold, essay_id, prompt_key, parsing_intput.split('Now work on the following input:')[-1], parsing_output
+            #     ))
+            #     logger.info('\n=================\n\n')
+        return parsed_llm_outputs
 
     def prep_prompt(self, essay_batch):
         '''
@@ -351,24 +361,25 @@ class FineGrainEvaluator():
             model_prefix = "<|begin_of_text|>"
             model_suffix=""
         else:
-            # raise NotImplementedError
             model_prefix=""
             model_suffix=""
         
+        ### Linguistic Features - Part 1 ### 
         ling_feature_data = {}
         use_ling_feature = False
         if self.args.ling_features != []:
             try:
                 ling_feature_data = pd.read_csv('./data/asap/hand_crafted_cleaned.csv')
-                ling_feature_data.index = ling_feature_data['item_id'] # use essay id as the index 
+                ling_feature_data.index = ling_feature_data['essay_id'] # use essay id as the index 
                 use_ling_feature = True
             except:
-                print('[ERROR] Failed to load linguistic features!')
+                logger.info('[ERROR] Failed to load linguistic features!')
+            ling_feature_desc_dict = load_json('./data/asap/ling_feature_keys.json')
 
         for i in range(len(essay_batch)):
             essay, essay_id, essay_set = essay_batch[i]
             if counter_per_set[essay_set] == self.limit: continue
-            if self.args.use_machine_rubric and essay_set in [2, 7, 8]: continue
+            if self.args.use_machine_rubric and essay_set in [2, 7, 8]: continue # skip 2, 7, 8 when using machine rubrics
                 
             # essay set specific data
             meta_data = self.essay_meta_data[essay_set - 1]
@@ -378,13 +389,13 @@ class FineGrainEvaluator():
                 fine_grained_prompts = meta_data[self.fine_grained_rubric_key]
             else:
                 fine_grained_prompts = {
-                    self.hard_code_holistic_prompt_key: ""
+                    self.hard_code_holistic_prompt_key: "" # use "Overall" as key
                 }
 
             for prompt_key in fine_grained_prompts:
                 if self.fine_grained:
                     fine_grained_prompt = prompt_key
-                    score_format = str({prompt_key: ""}).replace("'", '"')
+                    # score_format = str({prompt_key: ""}).replace("'", '"')
                     if essay_set == 2:
                         if prompt_key == "Writing Applications":
                             scoring_range = (1, 6)
@@ -395,45 +406,77 @@ class FineGrainEvaluator():
                     scoring_range = f"from {scoring_range[0]} to {scoring_range[1]}"
                 else:
                     fine_grained_prompt = ""
-                    score_format = str({k: "" for k in meta_data['scoring_rubric']}).replace("'", '"')
+                    # score_format = str({k: "" for k in meta_data['scoring_rubric']}).replace("'", '"')
                     scoring_range = "\n".join([
                         f"{score_type}: from {meta_data['single_evaluator_score_ranges'][j][0]} to {meta_data['single_evaluator_score_ranges'][j][1]}"
                         for j, score_type in enumerate(meta_data["scoring_rubric"])
                     ])
                 
-                rubric, overall_description = self.generate_rubics(meta_data, prompt_key)
-                if self.verbalize and self.fine_grained:
+                rubric, overall_description = self.generate_rubics(meta_data, prompt_key) ## TODO: check rubric generation, might have some problem 
+
+                if self.fine_grained:
+                    if self.verbalize: # fine-grained and verbalized
+                        tmp_analysis_instruction = self.analysis_instruction.format(
+                            fine_grained_prompt = fine_grained_prompt,
+                            scoring_range = scoring_range,
+                            rubric = "\n- Here are some grading reference: " + rubric
+                        )
+                    else: # fine-grained only
+                        tmp_analysis_instruction = self.analysis_instruction.format(
+                            fine_grained_prompt = fine_grained_prompt,
+                            scoring_range = scoring_range,
+                            rubric = overall_description
+                        )
+                else:
                     tmp_analysis_instruction = self.analysis_instruction.format(
                         fine_grained_prompt = fine_grained_prompt,
                         scoring_range = scoring_range,
                         rubric = "\n- Here are some grading reference: " + rubric
                     )
-                else:
-                    tmp_analysis_instruction = self.analysis_instruction.format(
-                        fine_grained_prompt = fine_grained_prompt,
-                        scoring_range = scoring_range,
-                        rubric = overall_description
-                    )
+                    
+                ### Linguistic Features - Part 2 ### 
                 additional_information = ''
-
                 if use_ling_feature:
-                    additional_information = '### Additional Information:\n'
-                    # readability_results = readability.getmeasures(essay, lang='en')
+                    if self.args.ling_features_normalized:
+                        additional_information = '### Additional Information (scores standardized to 0~1):\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay\n '
+                    else:
+                        additional_information = '### Additional Information:\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay\n'
                     for ling_feature in self.args.ling_features:
-                        if ling_feature in ling_feature_data.columns:
+                        if ling_feature not in ling_feature_data.columns:
+                            continue
+                        ling_feature_desc = ling_feature_desc_dict[ling_feature]
+                        if self.args.ling_features_normalized:
+                            tmp_ling_feature = round(ling_feature_data.loc[essay_id][ling_feature + "_norm"], 2) # round to 2nd 
+                            additional_information += '- {}: {}\n'.format(
+                                ling_feature_desc,
+                                tmp_ling_feature
+                            )
+                        else:
                             tmp_ling_feature = round(ling_feature_data.loc[essay_id][ling_feature], 2) # round to 2nd 
                             group_median = round(ling_feature_data.loc[essay_id][ling_feature + '_median'], 2)
-                        else:
-                            continue
+                            if self.args.ling_features_no_median:
+                                additional_information += '- {}: {}\n'.format(
+                                    ling_feature_desc,
+                                    tmp_ling_feature,
+                                    # group_median
+                                )
+                            else:
+                                additional_information += '- {}: {} (median: {})\n'.format(
+                                ling_feature_desc,
+                                tmp_ling_feature,
+                                group_median
+                            )
 
-                        additional_information += '- {}: {} (median: {})\n'.format(
-                            ling_feature,
-                            tmp_ling_feature,
-                            group_median
-                        )
-                        
-                # print('tmp_analysis_instruction:', tmp_analysis_instruction)
-                tmp_format_instruction = self.format_instruction.replace('{score_format}', score_format)
+                ### NOTE: here, we append some additional formatting instructions 
+                # tmp_format_instruction = self.format_instruction.replace('{score_format}', score_format)
+                # tmp_format_instruction = self.format_instruction.replace('Score:', '{}:'.format(prompt_key))
+                tmp_format_instruction = self.format_instruction.strip()
+                if self.fine_grained:
+                    tmp_format_instruction += '\n- {}:'.format(prompt_key)
+                else:
+                    for tmp_prompt_key in meta_data["scoring_rubric"]:
+                        tmp_format_instruction += '\n- {}:'.format(tmp_prompt_key)
+                
                 llm_prompt = make_prompt(
                     self.prompt_template,
                     {
@@ -453,34 +496,42 @@ class FineGrainEvaluator():
     
     def process_batch(self, essay_batch):
         
-        ## option 1: skil the vllm part
+        ## Part 1: LLM prompting (could be skipped)
         if not self.args.skip_llm:
             all_prompts, all_prompts_id = self.prep_prompt(essay_batch)
-            llm_outputs = self.prompt_llm(all_prompts)
+            if not self.args.test_prompt:
+                llm_outputs = self.prompt_llm(all_prompts)
             
-            ## result post processing ##
-            raw_log_data = {}
-            for i in range(len(all_prompts)):
-                tmp_essay_set = int(all_prompts_id[i][1]) - 1
-                if 'fold_0_{}'.format(tmp_essay_set) not in raw_log_data:
-                    raw_log_data['fold_0_{}'.format(tmp_essay_set)] = []
-                tmp_dp = {
-                    'essay': all_prompts_id[i][3],
-                    'essay_set': all_prompts_id[i][1],
-                    'id': all_prompts_id[i][0],
-                    'output_parsing_info': None,
-                    'output': llm_outputs[i],
-                    'llm_prompt': all_prompts[i],
-                    'prompt_key': all_prompts_id[i][2],
-                    # 'parsed_output': self.parse_llm_output(llm_outputs[i]),
-                }
-                raw_log_data['fold_0_{}'.format(tmp_essay_set)].append(tmp_dp)
-            with open(self.raw_output_path, 'w') as f:
-                f.write(json.dumps(raw_log_data))
+                ## result post processing ##
+                raw_log_data = {}
+                for i in range(len(all_prompts)):
+                    tmp_essay_set = int(all_prompts_id[i][1]) - 1
+                    if 'fold_0_{}'.format(tmp_essay_set) not in raw_log_data:
+                        raw_log_data['fold_0_{}'.format(tmp_essay_set)] = []
+                    tmp_dp = {
+                        'essay': all_prompts_id[i][3],
+                        'essay_set': all_prompts_id[i][1],
+                        'id': all_prompts_id[i][0],
+                        'output_parsing_info': None,
+                        'output': llm_outputs[i],
+                        'llm_prompt': all_prompts[i],
+                        'prompt_key': all_prompts_id[i][2],
+                    }
+                    raw_log_data['fold_0_{}'.format(tmp_essay_set)].append(tmp_dp)
+                with open(self.raw_output_path, 'w') as f:
+                    f.write(json.dumps(raw_log_data))
+            else:
+                pickle.dump(all_prompts, open('tmp.prompts.pkl', 'wb'))
+                return all_prompts
         else:
             with open(self.raw_output_path, 'r') as f:
                 raw_log_data = json.load(f)
         
+        ## parsing results
+        parsed_llm_outputs = self.parse_output_via_prompting(raw_log_data)
+        # write_json(parsed_llm_outputs, 'parsed_llm_outputs.json')
+        # exit(0)
+        pickle.dump(parsed_llm_outputs, open('parsed_llm_outputs.pkl', 'wb'))
         ## merge sub category scores ## 
         processed_log_data = {k: [] for k in list(raw_log_data.keys())}
         
@@ -491,6 +542,19 @@ class FineGrainEvaluator():
                 tmp_dp_dict[tmp_dp['id']].append(tmp_dp)
             
             total_score, total_neg = 0, 0
+            first_dp_in_fold = True
+
+
+            ## referencing code
+            '''
+            tmp_format_instruction = self.format_instruction.strip()
+            if self.fine_grained:
+                tmp_format_instruction += '\n- {}:'.format(prompt_key)
+            else:
+                for tmp_prompt_key in meta_data["scoring_rubric"]:
+                    tmp_format_instruction += '\n- {}:'.format(tmp_prompt_key)
+            '''
+
             for essay_id in tmp_dp_dict:
                 tmp_groupped_output = {
                     'essay': tmp_dp_dict[essay_id][0]['essay'],
@@ -498,43 +562,42 @@ class FineGrainEvaluator():
                     'output_parsing_info': None,
                     'output': [dp['output'] for dp in tmp_dp_dict[essay_id]],
                     'llm_prompt': {dp['prompt_key']: dp['llm_prompt'] for dp in tmp_dp_dict[essay_id]},
-                    # 'prompt_key': [dp['prompt_key'] for dp in tmp_dp_dict[essay_id]],
+                    # 'raw_parsed_output': {
+                    #     dp['prompt_key']: self.parse_llm_output(dp['output'], trait = dp['prompt_key']) 
+                    #     for dp in tmp_dp_dict[essay_id]
+                    # }
                     'raw_parsed_output': {
-                        dp['prompt_key']: self.parse_llm_output(dp['output'], trait = dp['prompt_key']) 
+                        dp['prompt_key']: parsed_llm_outputs[fold][(str(essay_id), dp['prompt_key'])]
                         for dp in tmp_dp_dict[essay_id]
                     }
                 }
-                # the parsed score is stored in parsed_output 
-
+                
+                # logging code
+                if first_dp_in_fold:
+                    logger.info('fold: {}, id: {}, fine_grained: {}\ntmp_groupped_output["raw_parsed_output"]: {}\n===================\n'.format(
+                        fold, essay_id, self.fine_grained, tmp_groupped_output['raw_parsed_output']
+                    ))
+                    first_dp_in_fold = False 
+                
+                # get the scores
                 if self.fine_grained:
                     essay_set_number = tmp_dp_dict[essay_id][0]['essay_set']
-                    # scores = [
-                    #     list(tmp_groupped_output['raw_parsed_output'][prompt_key]['Score'].values())[0]
-                    #     for prompt_key in tmp_groupped_output['raw_parsed_output']
-                    # ]
                     prompt_keys = [prompt_key for prompt_key in tmp_groupped_output['raw_parsed_output']]
-                    # scores = [
-                    #     tmp_groupped_output['raw_parsed_output'][prompt_key]['Score'][prompt_key]
-                    #     for prompt_key in prompt_keys
-                    # ]
                     scores = []
                     for prompt_key in prompt_keys:
-                        # if prompt_key in tmp_groupped_output['raw_parsed_output'][prompt_key]['Score']:
-                        #     score = tmp_groupped_output['raw_parsed_output'][prompt_key]['Score'][prompt_key]
-                        # else:
-                        #     score = -1
                         try:
                             score = tmp_groupped_output['raw_parsed_output'][prompt_key]['Score'][prompt_key]
                         except:
-                            score = -1
+                            try:
+                                score = tmp_groupped_output['raw_parsed_output'][prompt_key]['Score'][self.hard_code_holistic_prompt_key]
+                            except:
+                                score = -1
                         scores.append(score)
-                    # print("essay_set_number:", essay_set_number)
-                    # print("prompt_keys", prompt_keys)
-                    # print("scores:", scores)
-                    # print('--------')
                     cleaned_scores = [clean_single_score(score_str) for score_str in scores]
                     total_score += len(list(cleaned_scores))
                     total_neg += sum([score == -1 for score in cleaned_scores])
+                    
+                    # decide the key of the output is either 'Overall' or '{fine_grained_category}'
                     if essay_set_number in [1, 3, 4, 5, 6]:
                         cleaned_scores = [s for s in cleaned_scores if s != -1]
                         overall_score = -1 if len(cleaned_scores) == 0 else round(np.mean(cleaned_scores))
@@ -548,19 +611,34 @@ class FineGrainEvaluator():
                         }
                     tmp_groupped_output['parsed_output'] = score_dict
                 else:
-                    score_dict = tmp_groupped_output['raw_parsed_output'][self.hard_code_holistic_prompt_key]['Score']
+                    # logger.info('============== line 591 ==============')
+                    # logger.info(tmp_groupped_output['raw_parsed_output'][self.hard_code_holistic_prompt_key])
+                    if 'Score' in tmp_groupped_output['raw_parsed_output'][self.hard_code_holistic_prompt_key]:
+                        score_dict = tmp_groupped_output['raw_parsed_output'][self.hard_code_holistic_prompt_key]['Score']
+                    else:
+                        score_dict = {self.hard_code_holistic_prompt_key: -1}
                     for k in score_dict:
-                        score_dict[k] = int(float(score_dict[k]))
+                        try:
+                            score_dict[k] = int(float(score_dict[k]))
+                        except:
+                            print('[Error] Cannot convert score into integer, score_dict[k] = {}(k = "{}")'.format(score_dict[k], k))
+                            score_dict[k] = -1 
                     tmp_groupped_output['parsed_output'] = score_dict
                     total_score += len(list(score_dict.keys()))
                     total_neg += sum([score == -1 for score in list(score_dict.values())])
 
                 processed_log_data[fold].append(tmp_groupped_output)
             with open(self.parsing_log_path, 'a') as f:
-                f.write('[INFO] fold: {}; total score count: {}; total -1 count: {}\n'.format(fold, total_score, total_neg))
+                f.write('xxx [INFO] fold: {}; total score count: {}; total -1 count: {} ({}%)\n'.format(
+                    fold, 
+                    total_score, 
+                    total_neg,
+                    round(total_neg / total_score * 100, 2)
+                ))
             with open(self.cleaned_output_path, 'w') as f:
                 f.write(json.dumps(processed_log_data))
-        
+        with open(self.parsing_log_path, 'a') as f:
+            f.write('===========================\n\n')
         return processed_log_data, raw_log_data
     
 def load_asap_id(id_dir, split = 'train'):
@@ -573,24 +651,6 @@ def load_asap_id(id_dir, split = 'train'):
 # def run_multiple(config_dir):
 
 if __name__ == '__main__':
-
-    ## texting llama 3 ##
-    # prompt = """\nYou are part of an educational research team analyzing the writing skills of students in grades 7 to 10. 
-    # You have been given a student's essay and the prompt they responded to.\n\n#### Essay Prompt:\n'''\n
-    # More and more people use computers, but not everyone agrees that this benefits society. Those who support advances in technology believe that computers have a positive effect on people. 
-    # They teach hand-eye coordination, give people the ability to learn about faraway places and people, and even allow people to talk online with other people.
-    #   Others have different ideas. Some experts are concerned that people are spending too much time on their computers and less time exercising, enjoying nature, and interacting with family and friends. \n\nWrite a letter to your local newspaper in which you state your opinion on the effects computers have on people. Persuade the readers to agree with you.\n'''\n\n#### Analyzed Student Essay:\n'''Dear local newspaper, I think effects computers have on people are great learning skills/affects because they give us time to chat with friends/new people, helps us learn about the globe(astronomy) and keeps us out of troble! Thing about! Dont you think so? How would you feel if your teenager is always on the phone with friends! Do you ever time to chat with your friends or buisness partner about things. Well now - there's a new way to chat the computer, theirs plenty of sites on the internet to do so: @ORGANIZATION1, @ORGANIZATION2, @CAPS1, facebook, myspace ect. Just think now while your setting up meeting with your boss on the computer, your teenager is having fun on the phone not rushing to get off cause you want to use it. How did you learn about other countrys/states outside of yours? Well I have by computer/internet, it's a new way to learn about what going on in our time! You might think your child spends a lot of time on the computer, but ask them so question about the economy, sea floor spreading or even about the @DATE1's you'll be surprise at how much he/she knows. Believe it or not the computer is much interesting then in class all day reading out of books. If your child is home on your computer or at a local library, it's better than being out with friends being fresh, or being perpressured to doing something they know isnt right. You might not know where your child is, @CAPS2 forbidde in a hospital bed because of a drive-by. Rather than your child on the computer learning, chatting or just playing games, safe and sound in your home or community place. Now I hope you have reached a point to understand and agree with me, because computers can have great effects on you or child because it gives us time to chat with friends/new people, helps us learn about the globe and believe or not keeps us out of troble. Thank you for listening.'''\n\n### Analysis Task:\n- Rate this essay in the following aspect: {'prompt': 'The essay has fully elaborated reasons with specific details.'}(The essay has fully elaborated reasons with specific details.), with 1 being worst and 6 being good.\n- Give the result in the following format: \n    - Score: \n    - Explanation: \n    - Edit suggestions:\n"""
-    # prompt = """hello, what is your name?"""
-    
-    # # vllm = VLLM(model="meta-llama/Meta-Llama-3.1-8B-Instruct", max_length=4096, temperature=0.01)
-    # # vllm = VLLM(model="meta-llama/Llama-3.1-8B-Instruct", max_length=4096, temperature=0.01)
-    
-    # vllm = VLLM(model="mistralai/Mistral-7B-Instruct-v0.2", max_length=4096, temperature=0.01) ## current version
-    # # vllm = VLLM(model="meta-llama/Meta-Llama-3-8B-Instruct", max_length=4096, temperature=0.01) ## current version
-    # llm_output = vllm.batch([prompt])
-    # print(llm_output)
-    # exit(0)
-
 
     # parse arguments
     parser = argparse.ArgumentParser()
@@ -605,6 +665,7 @@ if __name__ == '__main__':
     parser.add_argument("--verbalize", action="store_true")
     parser.add_argument("--use_machine_rubric", action="store_true")
     parser.add_argument("--skip_llm", action="store_true") # default to be false
+    parser.add_argument("--test_prompt", action="store_true") # default to be false
     # parser.add_argument("--raw_log_data_file", type=str, default='raw_log_data.json')
     
     ## model configurations
@@ -618,6 +679,8 @@ if __name__ == '__main__':
     parser.add_argument("--prompt_template", type=int, default=3, choices=[1, 2, 3, 4, 5])
     parser.add_argument("--analysis_instruction", type=str, default="simple")
     parser.add_argument("--ling_features", type=list, default=[])
+    parser.add_argument("--ling_features_normalized", action="store_true")
+    parser.add_argument("--ling_features_no_median", action="store_true")
     # parser.add_argument("--setting", type=str, default="one-shot", choices=["one-shot", "few-shot"])
     # parser.add_argument("--full-rubric", action="store_true")
     # parser.add_argument("--instruction-variant", type=int, default=1, choices=[1, 2, 3, 4])
@@ -665,6 +728,8 @@ if __name__ == '__main__':
         for run in run_list:
             logger.info(str(run))
         
+        all_result_df = []
+        last_dir = ''
         for config in run_list:
             # run_id = config["run_id"]
             t_args = argparse.Namespace()
@@ -679,18 +744,25 @@ if __name__ == '__main__':
             result_df = evaluation(
                 fge.cleaned_output_path,
             )
-            result_df.to_csv(fge.qwk_summary_path)
+            result_df['run_id'] = args.run_id
+            result_df.to_csv(fge.qwk_summary_path, index = False)
+            all_result_df.append(result_df)
 
             log_dir = './log/' ## TODO: change this!!!
-
             cleaned_output = load_json(log_dir + args.run_id + '/cleaned_output.json')
             all_fold_stats = {
                 "run_id": args.run_id
             }
-            del fge.llm 
+            last_dir = log_dir + args.run_id
+            try:
+                del fge.llm 
+            except:
+                pass
             del fge
             del log_data
-
+            
+        super_dir = '/'.join((last_dir).split('/')[:-1])
+        pd.concat(all_result_df).to_csv(super_dir + '/all_result_df.csv')
     
     else: ## single task 
         ## initialization ## 

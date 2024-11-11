@@ -1,0 +1,152 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "ling_features_v2_0/no_ling",
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": []
+        },
+        {
+            "run_id": "ling_features_v2_0/unique_word",
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/first_two",
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word", 
+                "complex_words_dc"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/full_feat",
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word", 
+                "complex_words_dc",
+                "sentences",
+                "long_words",
+                "ess_char_len",
+                "characters"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/unique_word_no_median",
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features_no_median": true,
+            "ling_features": [
+                "unique_word"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/first_two_no_median",
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features_no_median": true,
+            "ling_features": [
+                "unique_word", 
+                "complex_words_dc"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/full_feat_no_median",
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features_no_median": true,
+            "ling_features": [
+                "unique_word", 
+                "complex_words_dc",
+                "sentences",
+                "long_words",
+                "ess_char_len",
+                "characters"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/unique_word_machine_rub_fg",
+            "fine_grained": true,
+            "use_machine_rubric": true,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/full_feat_machine_rub_fg",
+            "fine_grained": true,
+            "use_machine_rubric": true,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word", 
+                "complex_words_dc",
+                "sentences",
+                "long_words",
+                "ess_char_len",
+                "characters"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/no_feat_machine_rub_fg",
+            "fine_grained": true,
+            "use_machine_rubric": true,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": []
+        },
+        {
+            "run_id": "ling_features_v2_0/unique_word_normalized",
+            "prompt_template": 3,
+            "ling_features_normalized": true,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/first_two_normalized",
+            "prompt_template": 3,
+            "ling_features_normalized": true,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word", 
+                "complex_words_dc"
+            ]
+        },
+        {
+            "run_id": "ling_features_v2_0/full_feat_normalized",
+            "prompt_template": 3,
+            "ling_features_normalized": true,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "ling_features": [
+                "unique_word", 
+                "complex_words_dc",
+                "sentences",
+                "long_words",
+                "ess_char_len",
+                "characters"
+            ]
+        }
+    ]
+}

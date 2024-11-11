@@ -1,0 +1,22 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "test/parsing/holistic",
+            "fine_grained": false,
+            "verbalize": false,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": 5
+        },
+        {
+            "run_id": "test/parsing/fg",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": 5
+        }
+    ]
+}
