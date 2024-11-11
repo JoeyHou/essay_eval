@@ -41,6 +41,6 @@ HF_HOME=/ihome/dvillarreal/alc307/ix/ix_models/hugging_face/
 python prompt-llms.py \
     -m mistralai/Mistral-7B-Instruct-v0.2 \
     -d $DIRECTORY$DATA $DIRECTORY$RUBRIC \
-    -l logs/log2.log debug/debug2.log errors/err2.log \
+    -l logs/log3.log debug/debug3.log errors/err3.log \
     -t $HF_TOKEN \
     -hf $HF_HOME \
