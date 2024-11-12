@@ -48,7 +48,7 @@ def main(args: argparse.Namespace):
         model_prefix="", 
         model_suffix="",
         )
-    
+
     debug.debug(f"=====================PROMPT EXAMPLE=====================\n{prompt.format()}")
 
     llm = LLM(model=args.models[0])

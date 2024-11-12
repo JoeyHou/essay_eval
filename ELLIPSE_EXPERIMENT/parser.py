@@ -21,16 +21,16 @@ def main(args: argparse.Namespace):
     SCORES = re.compile(r'#+ ((?:Cohesion|Syntax|Vocabulary|Phraseology|Grammar|Conventions|Overall): \d)', re.I)
     CATS = ["COHESION", "SYNTAX", "VOCABULARY", "PHRASEOLOGY", "GRAMMAR", "CONVENTIONS", "OVERALL"]
 
-    scores = []
+    records = []
     for line in lines:
 
-        scores = [(text.split(":")[0].strip(), text.split(":")[1].strip()) for text in SCORES.findall(line)]
-        log.info(f"{', '.join(scores)}")
+        score_key = {text.split(":")[0].upper(): int(text.split(":")[1]) for text in SCORES.findall(line)}
+        records.append({cat : score_key[cat] if cat in score_key else pd.NA for cat in CATS})
 
-        for cat in CATS:
-            pass
+    df = pd.DataFrame.from_records(records)
 
-    pd.DataFrame.from_records()
+    print(df.info())
+
 
 def add_args(parser: argparse.ArgumentParser):
 
