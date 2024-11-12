@@ -24,9 +24,13 @@ def main(args: argparse.Namespace):
     scores = []
     for line in lines:
 
-        scores = SCORES.findall(line)
-        log.info(f"{', '.join(SCORES.findall(line))}")
+        scores = [(text.split(":")[0].strip(), text.split(":")[1].strip()) for text in SCORES.findall(line)]
+        log.info(f"{', '.join(scores)}")
 
+        for cat in CATS:
+            pass
+
+    pd.DataFrame.from_records()
 
 def add_args(parser: argparse.ArgumentParser):
 
