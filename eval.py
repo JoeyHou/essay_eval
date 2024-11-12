@@ -177,7 +177,7 @@ class FineGrainEvaluator():
         ## define output location
         self.cleaned_output_path = './log/{}/cleaned_output.json'.format(args.run_id)
         self.raw_output_path = './log/{}/raw_output.json'.format(args.run_id)
-        self.parsing_log_path = './log/{}/parsing_log.txt'.format(args.run_id)
+        self.parsing_log_path = './log/{}/parsing_log.csv'.format(args.run_id)
         self.qwk_summary_path = './log/{}/qwk.csv'.format(args.run_id)
         os.makedirs('./log/{}'.format(args.run_id), exist_ok = True)
 
@@ -534,6 +534,7 @@ class FineGrainEvaluator():
         pickle.dump(parsed_llm_outputs, open('parsed_llm_outputs.pkl', 'wb'))
         ## merge sub category scores ## 
         processed_log_data = {k: [] for k in list(raw_log_data.keys())}
+        parsing_stats = {}
         
         for fold in raw_log_data:
             all_essay_id = np.unique([tmp_dp['id'] for tmp_dp in raw_log_data[fold]])
@@ -628,19 +629,38 @@ class FineGrainEvaluator():
                     total_neg += sum([score == -1 for score in list(score_dict.values())])
 
                 processed_log_data[fold].append(tmp_groupped_output)
-            with open(self.parsing_log_path, 'a') as f:
-                f.write('xxx [INFO] fold: {}; total score count: {}; total -1 count: {} ({}%)\n'.format(
-                    fold, 
-                    total_score, 
-                    total_neg,
-                    round(total_neg / total_score * 100, 2)
-                ))
+            # with open(self.parsing_log_path, 'a') as f:
+            #     f.write('xxx [INFO] fold: {}; total score count: {}; total -1 count: {} ({}%)\n'.format(
+            #         fold, 
+            #         total_score, 
+            #         total_neg,
+            #         round(total_neg / total_score * 100, 2)
+            #     ))
+            parsing_stats[fold] = {
+                'score_count': total_score,
+                'invalid_count': total_neg,
+                'invalid_prob': round(total_neg / total_score, 4)
+            }
             with open(self.cleaned_output_path, 'w') as f:
                 f.write(json.dumps(processed_log_data))
-        with open(self.parsing_log_path, 'a') as f:
-            f.write('===========================\n\n')
+        # with open(self.parsing_log_path, 'a') as f:
+        #     f.write('===========================\n\n')
+        parsing_log_df = post_process_parsing_log(parsing_stats)
+        parsing_log_df.to_csv(self.parsing_log_path)
         return processed_log_data, raw_log_data
-    
+
+def post_process_parsing_log(parsing_stats):
+    def parsing_log_acc(s):
+        if 'count' in s.name:
+            return s.sum()
+        else:
+            return s.mean()
+    tmp_parsing_log_df = pd.DataFrame(parsing_stats)
+    tmp_acc_stats = tmp_parsing_log_df.apply(parsing_log_acc, axis = 1)
+    tmp_acc_stats['invalid_prob'] = round(tmp_acc_stats['invalid_count'] / tmp_acc_stats['score_count'], 4)
+    tmp_parsing_log_df['acc_stats'] = tmp_acc_stats
+    return tmp_parsing_log_df 
+
 def load_asap_id(id_dir, split = 'train'):
     id_lst = []
     with open(id_dir + split + '_ids.txt', 'r') as f:
