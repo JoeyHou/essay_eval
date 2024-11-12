@@ -23,8 +23,10 @@ log, debug, err = logging.getLogger(), logging.getLogger(), logging.getLogger()
 
 def set_environment(token: str, model_store: str):
 
-    os.environ['HF_TOKEN'] = json.load(token)['token']
-    debug.debug(f"HF_TOKEN set to {token}")
+    with open(token, 'r') as src:
+
+        os.environ['HF_TOKEN'] = json.load(src)['token']
+        debug.debug(f"HF_TOKEN set to {token}")
 
     if model_store != "":
 
@@ -45,6 +47,7 @@ def main(args: argparse.Namespace):
         scoring_range=(1, 5),
         essay_prompt=test_df['prompt'][0],
         essay=test_df['full_text'][0],
+        additional_information = "",
         model_prefix="", 
         model_suffix="",
         )
@@ -60,7 +63,7 @@ def main(args: argparse.Namespace):
             scoring_range=(1, 5),
             essay_prompts=test_df['prompt'],
             essays=test_df['full_text'],
-            additional_information = "",
+            additional_information = [""] * len(test_df),
             model_prefix="", 
             model_suffix="",
             )

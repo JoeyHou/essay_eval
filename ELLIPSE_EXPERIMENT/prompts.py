@@ -58,7 +58,7 @@ def make_prompt(**kwargs) -> PromptTemplate:
     ai = PromptTemplate.from_template(template=analysis_instruction).format(**kwargs)
     fi = PromptTemplate.from_template(template=format_instruction).format()
 
-    prompt = PromptTemplate.from_template(template=prompt_template_1)
+    prompt = PromptTemplate.from_template(template=prompt_template_3)
     return prompt.partial(**kwargs, analysis_instruction=ai, format_instruction=fi)
 
 
@@ -85,13 +85,14 @@ def batch_prompts(format=True, **kwargs) -> PromptTemplate:
         The minimum and maximum range scores can take.
     """
 
-    for prompt, essay in zip(kwargs["essay_prompts"], kwargs["essays"]):
+    for prompt, essay, add_info in zip(kwargs["essay_prompts"], kwargs["essays"], kwargs["additional_information"]):
 
         output = make_prompt(
             rubric=kwargs['rubric'], 
             scoring_range=kwargs['scoring_range'],
             essay_prompt=prompt,
             essay=essay,
+            additional_information=add_info,
             model_prefix=kwargs['model_prefix'], 
             model_suffix=kwargs['model_suffix'],
         )

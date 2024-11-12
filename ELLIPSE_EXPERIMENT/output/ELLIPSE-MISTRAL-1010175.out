@@ -1,0 +1,16 @@
+RUN: Tue Nov 12 01:04:19 EST 2024
+RUN: Tue Nov 12 01:04:33 EST 2024
+/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/connections.py:8: RuntimeWarning: Failed to read commit hash:
+No module named 'vllm._version'
+  from vllm.version import __version__ as VLLM_VERSION
+<Logger log-0 (INFO)> <Logger log-1 (DEBUG)> <Logger log-2 (WARNING)>
+Traceback (most recent call last):
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 146, in <module>
+    main(args)
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 37, in main
+    set_environment(args.token, args.huggingface)
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 26, in set_environment
+    os.environ['HF_TOKEN'] = json.load(token)['token']
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+AttributeError: 'str' object has no attribute 'read'
