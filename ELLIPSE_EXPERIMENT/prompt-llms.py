@@ -34,6 +34,8 @@ def set_environment(token: str, model_store: str):
 
 def main(args: argparse.Namespace):
 
+    set_environment(args.token, args.huggingface)
+
     test_df = pd.read_csv(args.data[0])
     rubric = make_rubric(args.data[1])
 
@@ -58,6 +60,7 @@ def main(args: argparse.Namespace):
             scoring_range=(1, 5),
             essay_prompts=test_df['prompt'],
             essays=test_df['full_text'],
+            additional_information = "",
             model_prefix="", 
             model_suffix="",
             )
@@ -67,6 +70,7 @@ def main(args: argparse.Namespace):
 
     # Print the outputs.
     for output in tqdm(outputs, desc="Running model on dataset..."):
+
         prompt = output.prompt
         generated_text = output.outputs[0].text
         log.info(f"Generated text: {generated_text!r}")

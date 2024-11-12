@@ -13,21 +13,24 @@ format_instruction = '''
 ### '''
 
 ###################### Prompt Template ######################
-prompt_template_1 = """
+prompt_template_3 = """
 {model_prefix}
 
-You are given an essay written by a student and the corresponding prompt for the 7th to 10th grade student. 
+You are part of an educational research team analyzing the writing skills of students in grades 7 to 10. You have been given a student's essay and the prompt they responded to.
 
-### Prompt: 
+### Essay Prompt:
 '''{essay_prompt}'''
 
-### Task:
+### Analysis Task:
 {analysis_instruction}
 
-### Student essay: 
+### Analyzed Student Essay:
 '''{essay}'''
 
-Finally, after everything, give the grade in the following format:
+{additional_information}
+
+### Analysis
+Conclude your analysis with a grade and comments in the following format:
 {format_instruction}
 
 \n{model_suffix}"""
