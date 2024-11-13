@@ -1,0 +1,23 @@
+RUN: Mon Nov 11 01:21:45 EST 2024
+RUN: Mon Nov 11 01:21:51 EST 2024
+/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/connections.py:8: RuntimeWarning: Failed to read commit hash:
+No module named 'vllm._version'
+  from vllm.version import __version__ as VLLM_VERSION
+Traceback (most recent call last):
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 117, in <module>
+    add_args(parser)
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 99, in add_args
+    parser.add_argument(
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/argparse.py", line 1441, in add_argument
+    return self._add_action(action)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/argparse.py", line 1806, in _add_action
+    self._optionals._add_action(action)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/argparse.py", line 1643, in _add_action
+    action = super(_ArgumentGroup, self)._add_action(action)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/argparse.py", line 1455, in _add_action
+    self._check_conflict(action)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/argparse.py", line 1592, in _check_conflict
+    conflict_handler(action, confl_optionals)
+  File "/ihome/crc/install/python/Anaconda3-2022.10/lib/python3.9/argparse.py", line 1601, in _handle_conflict_error
+    raise ArgumentError(action, message % conflict_string)
+argparse.ArgumentError: argument -h/--huggingface: conflicting option string: -h

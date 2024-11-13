@@ -1,0 +1,202 @@
+# Prompting the Mistrel LLM on the Feedback Prize Datasets
+# Created by Alejandro Ciuba, alc307@pitt.edu
+from pathlib import Path
+from prompts import (make_prompt,
+                     batch_prompts,
+                     make_rubric, )
+from langchain.prompts import PromptTemplate
+from tqdm import tqdm
+from vllm import (LLM,
+                  SamplingParams, )
+
+import argparse
+import json
+import logger
+import logging
+import os
+
+import pandas as pd
+
+
+log, debug, err = logging.getLogger(), logging.getLogger(), logging.getLogger()
+
+
+def set_environment(token: str, model_store: str):
+
+    with open(token, 'r') as src:
+
+        os.environ['HF_TOKEN'] = json.load(src)['token']
+        debug.debug(f"HF_TOKEN set to {token}")
+
+    if model_store != "":
+
+        os.environ['HF_HOME'] = model_store
+        debug.debug(f"Set HF_HOME to {model_store}")
+
+
+def generate_features(data: pd.DataFrame, feats: list[str]):
+
+    base = "### Additional Information:\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay - "
+
+    if len(feats) % 2 != 0:
+
+        err.error("Feature list is not a column name followed by its in-prompt description.")
+        raise ValueError("Feature list is not a column name followed by its in-prompt description")
+
+    for row in data.itertuples():
+
+        for i in range(0, len(feats), 2):
+
+            start = feats[i + 1].strip()
+            stat = f"{getattr(row, feats[i]):.1f}"
+            median = f"{data[feats[i]].median():.1f}"
+
+            base += f"{start}: {stat} ({median}) - "
+
+        yield base
+
+
+def main(args: argparse.Namespace):
+
+    # Set environment variables
+    set_environment(args.token, args.huggingface)
+
+    test_df = pd.read_csv(args.data[0])
+    rubric = make_rubric(args.data[1])
+
+    # Get the linguistic features and their median scores
+    feats = True if "" not in args.features and len(args.features) > 1 else False
+    if feats:
+        additional_information = list(generate_features(test_df, args.features))
+
+    # Generate an example prompt
+    prompt = make_prompt(
+        rubric=rubric, 
+        scoring_range=(1, 5),
+        essay_prompt=test_df['prompt'][0],
+        essay=test_df['full_text'][0],
+        additional_information = additional_information[0] if feats else "",
+        model_prefix="", 
+        model_suffix="",
+        )
+
+    debug.debug(f"=====================PROMPT EXAMPLE=====================\n{prompt.format()}")
+
+    # Setup the model and prompts
+    llm = LLM(model=args.models[0])
+    sampling_params = SamplingParams(temperature=0.01, max_tokens=4096)  # As in Joey's eval.py
+
+    prompts = list(
+        batch_prompts(
+            rubric=rubric, 
+            scoring_range=(1, 5),
+            essay_prompts=test_df['prompt'],
+            essays=test_df['full_text'],
+            additional_information = additional_information if feats else [""] * len(test_df),
+            model_prefix="", 
+            model_suffix="",
+            )
+        )
+
+    # Run and print model output
+    output_list = []
+    for i in tqdm(range(0, len(prompts), args.batch), desc="Running model on dataset..."):
+
+        outputs = llm.generate(prompts[i: i + args.batch], sampling_params)
+        output_list.append(outputs)
+
+    # Print the outputs.
+    for outputs in output_list:
+
+        for output in outputs:
+
+            prompt = output.prompt
+            generated_text = output.outputs[0].text
+            log.info(f"Generated text: {generated_text!r}")
+
+
+def add_args(parser: argparse.ArgumentParser):
+
+    parser.add_argument(
+        "-d",
+        "--data",
+        type=Path,
+        nargs=2,
+        required=True,
+        help="Data paths leading to the CSV data and then the JSON rubric.\n \n",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--features",
+        type=str,
+        nargs="+",
+        default=[""],
+        help="Column names which have the linguistic features followed by their text description.\n \n"
+    )
+
+    parser.add_argument(
+        "-m",
+        "--models",
+        type=str,
+        nargs="+",
+        default=["facebook/opt-125m"],  # Will not treat it as a 1-element array otherwise
+        help="Model to prompt.\n \n",
+    )
+
+    parser.add_argument(
+        "-b",
+        "--batch",
+        type=int,
+        default=32,  # Will not treat it as a 1-element array otherwise
+        help="Batch size for input prompts.\n \n",
+    )
+
+    parser.add_argument(
+        "-l",
+        "--logging",
+        type=Path,
+        nargs=3,
+        required=True,
+        help="Paths to the main logger, debug logger and error logger.\n \n",
+    )
+
+    parser.add_argument(
+        "-t",
+        "--token",
+        type=str,
+        required=True,
+        help="Path to the JSON file containing the HuggingFace access token under 'token'.\n \n",
+    )
+
+    parser.add_argument(
+        "-hf",
+        "--huggingface",
+        type=str,
+        default="",
+        help="Path where the model should be stored if it is a HuggingFace model.\n \n",
+    )
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(
+        prog="prompts-llms.py",
+        formatter_class=argparse.RawTextHelpFormatter,
+        description="Run prompt-based LLMs via vllm.",
+        epilog="Created by Alejandro Ciuba, alc307@pitt.edu",
+    )
+
+    add_args(parser)
+    args = parser.parse_args()
+
+    log, debug, err = logger.make_loggers(
+        *args.logging, 
+        levels=[logging.INFO,
+                logging.DEBUG,
+                logging.ERROR],
+        )
+    
+    print(log, debug, err)
+
+    main(args)
