@@ -1,0 +1,14 @@
+RUN: Wed Nov 13 01:41:18 EST 2024
+RUN: Wed Nov 13 01:41:21 EST 2024
+/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/connections.py:8: RuntimeWarning: Failed to read commit hash:
+No module named 'vllm._version'
+  from vllm.version import __version__ as VLLM_VERSION
+<Logger log-0 (INFO)> <Logger log-1 (DEBUG)> <Logger log-2 (ERROR)>
+Traceback (most recent call last):
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 188, in <module>
+    main(args)
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 70, in main
+    additional_information = list(generate_features(test_df, args.features))
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 41, in generate_features
+    if feats % 2 != 0:
+TypeError: unsupported operand type(s) for %: 'list' and 'int'

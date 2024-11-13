@@ -38,7 +38,7 @@ def generate_features(data: pd.DataFrame, feats: list[str]):
 
     base = "### Additional Information:\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay - "
 
-    if feats % 2 != 0:
+    if len(feats) % 2 != 0:
 
         err.error("Feature list is not a column name followed by its in-prompt description.")
         raise ValueError("Feature list is not a column name followed by its in-prompt description")
@@ -99,14 +99,20 @@ def main(args: argparse.Namespace):
         )
 
     # Run and print model output
-    outputs = llm.generate(prompts, sampling_params)
+    output_list = []
+    for i in tqdm(range(0, len(prompts), args.batch), desc="Running model on dataset..."):
+
+        outputs = llm.generate(prompts[i: i + args.batch], sampling_params)
+        output_list.append(outputs)
 
     # Print the outputs.
-    for output in tqdm(outputs, desc="Running model on dataset..."):
+    for outputs in output_list:
 
-        prompt = output.prompt
-        generated_text = output.outputs[0].text
-        log.info(f"Generated text: {generated_text!r}")
+        for output in outputs:
+
+            prompt = output.prompt
+            generated_text = output.outputs[0].text
+            log.info(f"Generated text: {generated_text!r}")
 
 
 def add_args(parser: argparse.ArgumentParser):
@@ -135,7 +141,15 @@ def add_args(parser: argparse.ArgumentParser):
         type=str,
         nargs="+",
         default=["facebook/opt-125m"],  # Will not treat it as a 1-element array otherwise
-        help="Data required.\n \n",
+        help="Model to prompt.\n \n",
+    )
+
+    parser.add_argument(
+        "-b",
+        "--batch",
+        type=int,
+        default=32,  # Will not treat it as a 1-element array otherwise
+        help="Batch size for input prompts.\n \n",
     )
 
     parser.add_argument(
