@@ -34,12 +34,35 @@ def set_environment(token: str, model_store: str):
         debug.debug(f"Set HF_HOME to {model_store}")
 
 
+def generate_features(data: pd.DataFrame, feats: list[str]):
+
+    base = "### Additional Information:\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay - "
+
+    for row in data.itertuples():
+
+        for i in range(0, len(feats), 2):
+
+            start = feats[i + 1].strip()
+            stat = f"{getattr(row, feats[i]):.1f}"
+            median = f"{data[feats[i]].median():.1f}"
+
+            base += f"{start}: {stat} ({median})"
+
+        yield base
+
+
 def main(args: argparse.Namespace):
 
+    # Set environment variables
     set_environment(args.token, args.huggingface)
 
     test_df = pd.read_csv(args.data[0])
     rubric = make_rubric(args.data[1])
+
+    # Get the linguistic features and their median scores
+    feats = True if "" not in args.features and len(args.features) > 1 else False
+    if feats:
+        additional_information = list(generate_features(test_df, args.features))
 
     # Generate an example prompt
     prompt = make_prompt(
@@ -47,13 +70,14 @@ def main(args: argparse.Namespace):
         scoring_range=(1, 5),
         essay_prompt=test_df['prompt'][0],
         essay=test_df['full_text'][0],
-        additional_information = "",
+        additional_information = additional_information[0] if feats else "",
         model_prefix="", 
         model_suffix="",
         )
 
     debug.debug(f"=====================PROMPT EXAMPLE=====================\n{prompt.format()}")
 
+    # Setup the model and prompts
     llm = LLM(model=args.models[0])
     sampling_params = SamplingParams(temperature=0.01, max_tokens=4096)  # As in Joey's eval.py
 
@@ -63,12 +87,13 @@ def main(args: argparse.Namespace):
             scoring_range=(1, 5),
             essay_prompts=test_df['prompt'],
             essays=test_df['full_text'],
-            additional_information = [""] * len(test_df),
+            additional_information = additional_information if feats else [""] * len(test_df),
             model_prefix="", 
             model_suffix="",
             )
         )
 
+    # Run and print model output
     outputs = llm.generate(prompts, sampling_params)
 
     # Print the outputs.
@@ -88,6 +113,15 @@ def add_args(parser: argparse.ArgumentParser):
         nargs=2,
         required=True,
         help="Data paths leading to the CSV data and then the JSON rubric.\n \n",
+    )
+
+    parser.add_argument(
+        "-f",
+        "--features",
+        type=str,
+        nargs="+",
+        default=[""],
+        help="Column names which have the linguistic features followed by their text description.\n \n"
     )
 
     parser.add_argument(

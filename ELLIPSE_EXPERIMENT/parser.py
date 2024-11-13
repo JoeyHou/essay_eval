@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import argparse
+import datetime
 import logger
 import logging
 import re
@@ -14,6 +15,8 @@ log = logging.getLogger()
 
 
 def main(args: argparse.Namespace):
+
+    log.info(f"===================== RUN {datetime.datetime.now()} =====================")
     
     with open(args.data, 'r') as src:
         lines = [line.strip() for line in src]
@@ -29,7 +32,9 @@ def main(args: argparse.Namespace):
 
     df = pd.DataFrame.from_records(records)
 
-    print(df.info())
+    log.info(df.info())
+
+    df.to_csv(args.save)
 
 
 def add_args(parser: argparse.ArgumentParser):
