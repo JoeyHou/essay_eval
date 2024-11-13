@@ -41,6 +41,7 @@ HF_HOME=/ihome/dvillarreal/alc307/ix/ix_models/hugging_face/
 python prompt-llms.py \
     -m mistralai/Mistral-7B-Instruct-v0.2 \
     -d $DIRECTORY$DATA $DIRECTORY$RUBRIC \
-    -l logs/log-noling.log debug/debug-noling.log errors/err-noling.log \
+    -f WORD_COUNT "total number of unique words in the essay" \
+    -l logs/log-ling.log debug/debug-ling.log errors/err-ling.log \
     -t $HF_TOKEN \
     -hf $HF_HOME \
