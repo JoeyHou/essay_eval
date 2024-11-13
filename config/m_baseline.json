@@ -1,0 +1,76 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "mistral_holistic_base_v1/exp_holistic_tmp1",
+            "fine_grained": false,
+            "verbalize": false,
+            "prompt_template": 1,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_holistic_base_v1/exp_holistic_tmp2",
+            "fine_grained": false,
+            "verbalize": false,
+            "prompt_template": 2,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_holistic_base_v1/exp_holistic_tmp3",
+            "fine_grained": false,
+            "verbalize": false,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_holistic_base_v1/exp_holistic_tmp4",
+            "fine_grained": false,
+            "verbalize": false,
+            "prompt_template": 4,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_holistic_base_v1/exp_fg_tmp1",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 1,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_holistic_base_v1/exp_fg_tmp2",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 2,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_holistic_base_v1/exp_fg_tmp3",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 3,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        },
+        {
+            "run_id": "mistral_holistic_base_v1/exp_fg_tmp4",
+            "fine_grained": true,
+            "verbalize": false,
+            "prompt_template": 4,
+            "analysis_instruction": "explanation", 
+            "model": "mistral",
+            "limit": -1
+        }
+    ]
+}

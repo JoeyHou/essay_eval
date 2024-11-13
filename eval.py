@@ -521,7 +521,7 @@ class FineGrainEvaluator():
                 with open(self.raw_output_path, 'w') as f:
                     f.write(json.dumps(raw_log_data))
             else:
-                pickle.dump(all_prompts, open('tmp.prompts.pkl', 'wb'))
+                pickle.dump(all_prompts, open('tmp/tmp.prompts.pkl', 'wb'))
                 return all_prompts
         else:
             with open(self.raw_output_path, 'r') as f:
@@ -531,7 +531,7 @@ class FineGrainEvaluator():
         parsed_llm_outputs = self.parse_output_via_prompting(raw_log_data)
         # write_json(parsed_llm_outputs, 'parsed_llm_outputs.json')
         # exit(0)
-        pickle.dump(parsed_llm_outputs, open('parsed_llm_outputs.pkl', 'wb'))
+        pickle.dump(parsed_llm_outputs, open('tmp/parsed_llm_outputs.pkl', 'wb'))
         ## merge sub category scores ## 
         processed_log_data = {k: [] for k in list(raw_log_data.keys())}
         parsing_stats = {}
