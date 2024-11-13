@@ -38,6 +38,11 @@ def generate_features(data: pd.DataFrame, feats: list[str]):
 
     base = "### Additional Information:\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay - "
 
+    if feats % 2 != 0:
+
+        err.error("Feature list is not a column name followed by its in-prompt description.")
+        raise ValueError("Feature list is not a column name followed by its in-prompt description")
+
     for row in data.itertuples():
 
         for i in range(0, len(feats), 2):
@@ -46,7 +51,7 @@ def generate_features(data: pd.DataFrame, feats: list[str]):
             stat = f"{getattr(row, feats[i]):.1f}"
             median = f"{data[feats[i]].median():.1f}"
 
-            base += f"{start}: {stat} ({median})"
+            base += f"{start}: {stat} ({median}) - "
 
         yield base
 
@@ -175,7 +180,7 @@ if __name__ == "__main__":
         *args.logging, 
         levels=[logging.INFO,
                 logging.DEBUG,
-                logging.WARNING],
+                logging.ERROR],
         )
     
     print(log, debug, err)
