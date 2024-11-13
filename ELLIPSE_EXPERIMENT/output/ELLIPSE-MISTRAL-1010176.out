@@ -1,0 +1,14 @@
+RUN: Tue Nov 12 01:10:50 EST 2024
+RUN: Tue Nov 12 01:10:52 EST 2024
+/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/connections.py:8: RuntimeWarning: Failed to read commit hash:
+No module named 'vllm._version'
+  from vllm.version import __version__ as VLLM_VERSION
+<Logger log-0 (INFO)> <Logger log-1 (DEBUG)> <Logger log-2 (WARNING)>
+Traceback (most recent call last):
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 148, in <module>
+    main(args)
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 45, in main
+    prompt = make_prompt(
+  File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompts.py", line 61, in make_prompt
+    prompt = PromptTemplate.from_template(template=prompt_template_1)
+NameError: name 'prompt_template_1' is not defined
