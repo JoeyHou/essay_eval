@@ -21,6 +21,7 @@ def main(args: argparse.Namespace):
     with open(args.data, 'r') as src:
         lines = [line.strip() for line in src]
 
+    # \d( points)? for Cohesion
     SCORES = re.compile(r'#+ ((?:Cohesion|Syntax|Vocabulary|Phraseology|Grammar|Conventions|Overall): \d)', re.I)
     CATS = ["COHESION", "SYNTAX", "VOCABULARY", "PHRASEOLOGY", "GRAMMAR", "CONVENTIONS", "OVERALL"]
 

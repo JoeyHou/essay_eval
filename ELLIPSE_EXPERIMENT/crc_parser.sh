@@ -4,7 +4,7 @@
 # Alejandro Ciuba, alc307@pitt.edu
 
 ############## SBATCH HEADER BEGIN ##############
-#SBATCH --job-name=ELLIPSE-MISTRAL
+#SBATCH --job-name=ELLIPSE-PARSER
 #SBATCH --output=output/%x-%A.out
 #SBATCH --mail-user=alc307@pitt.edu
 #SBATCH --mail-type=END
@@ -15,7 +15,7 @@
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks-per-node=1
-#SBATCH --time=5:00:00
+#SBATCH --time=1:00:00
 #SBATCH --qos=short
 ############## SBATCH HEADER END ##############
 
@@ -32,8 +32,8 @@ unset PYTHONPATH
 
 echo "RUN: `date`"
 
-DATA=logs/log3.log
-SAVE=data/scores-no-ling.csv
+DATA=logs/log-noling.log
+SAVE=data/scores-noling.csv
 LOG=logs/parser-log1.log
 
 python parser.py \

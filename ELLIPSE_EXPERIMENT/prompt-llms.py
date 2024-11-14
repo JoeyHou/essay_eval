@@ -10,6 +10,7 @@ from vllm import (LLM,
                   SamplingParams, )
 
 import argparse
+import datetime
 import json
 import logger
 import logging
@@ -36,7 +37,7 @@ def set_environment(token: str, model_store: str):
 
 def generate_features(data: pd.DataFrame, feats: list[str]):
 
-    base = "### Additional Information:\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay - "
+    base = "### Additional Information:\nEmperical studies show that these linguistic traits are highly correlated with the grade of the essay"
 
     if len(feats) % 2 != 0:
 
@@ -51,18 +52,26 @@ def generate_features(data: pd.DataFrame, feats: list[str]):
             stat = f"{getattr(row, feats[i]):.1f}"
             median = f"{data[feats[i]].median():.1f}"
 
-            base += f"{start}: {stat} ({median}) - "
+            base += f" - {start}: {stat} ({median})"
 
         yield base
 
 
 def main(args: argparse.Namespace):
 
+    start = f"EXPERIMENT DATE: {datetime.datetime.now().isoformat()}"
+
+    log.info(start)
+    debug.debug(start)
+    err.error(start)
+
     # Set environment variables
     set_environment(args.token, args.huggingface)
 
     test_df = pd.read_csv(args.data[0])
     rubric = make_rubric(args.data[1])
+
+    debug.debug(f"DATASET INFORMATION: {test_df.info()}")
 
     # Get the linguistic features and their median scores
     feats = True if "" not in args.features and len(args.features) > 1 else False
@@ -80,10 +89,12 @@ def main(args: argparse.Namespace):
         model_suffix="",
         )
 
+    log.debug(f"Settings: {args}")
+
     debug.debug(f"=====================PROMPT EXAMPLE=====================\n{prompt.format()}")
 
     # Setup the model and prompts
-    llm = LLM(model=args.models[0])
+    llm = LLM(model=args.models[0], gpu_memory_utilizaiton=0.7)
     sampling_params = SamplingParams(temperature=0.01, max_tokens=4096)  # As in Joey's eval.py
 
     prompts = list(
@@ -99,20 +110,14 @@ def main(args: argparse.Namespace):
         )
 
     # Run and print model output
-    output_list = []
-    for i in tqdm(range(0, len(prompts), args.batch), desc="Running model on dataset..."):
-
-        outputs = llm.generate(prompts[i: i + args.batch], sampling_params)
-        output_list.append(outputs)
+    outputs = llm.generate(prompts, sampling_params)
 
     # Print the outputs.
-    for outputs in output_list:
+    for output in tqdm(outputs, desc="Running model on dataset..."):
 
-        for output in outputs:
-
-            prompt = output.prompt
-            generated_text = output.outputs[0].text
-            log.info(f"Generated text: {generated_text!r}")
+        prompt = output.prompt
+        generated_text = output.outputs[0].text
+        log.info(f"Generated text: {generated_text!r}")
 
 
 def add_args(parser: argparse.ArgumentParser):

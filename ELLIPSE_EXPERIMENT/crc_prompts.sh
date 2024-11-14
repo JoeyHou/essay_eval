@@ -42,7 +42,7 @@ python prompt-llms.py \
     -m mistralai/Mistral-7B-Instruct-v0.2 \
     -b 128 \
     -d $DIRECTORY$DATA $DIRECTORY$RUBRIC \
-    -f WORD_COUNT "total number of unique words in the essay" \
+    -f HAPAX "total number of unique words in the essay" \
     -l logs/log-ling.log debug/debug-ling.log errors/err-ling.log \
     -t $HF_TOKEN \
     -hf $HF_HOME \
