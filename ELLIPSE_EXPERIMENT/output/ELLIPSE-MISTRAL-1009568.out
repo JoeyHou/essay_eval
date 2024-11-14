@@ -1,32 +1,0 @@
-RUN: Mon Nov 11 01:55:19 EST 2024
-RUN: Mon Nov 11 01:55:20 EST 2024
-/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/connections.py:8: RuntimeWarning: Failed to read commit hash:
-No module named 'vllm._version'
-  from vllm.version import __version__ as VLLM_VERSION
-<Logger log-0 (INFO)> <Logger log-1 (DEBUG)> <Logger log-2 (WARNING)>
-INFO 11-11 01:55:33 llm_engine.py:237] Initializing an LLM engine (vdev) with config: model='mistralai/Mistral-7B-Instruct-v0.2', speculative_config=None, tokenizer='mistralai/Mistral-7B-Instruct-v0.2', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, override_neuron_config=None, rope_scaling=None, rope_theta=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=32768, download_dir=None, load_format=LoadFormat.AUTO, tensor_parallel_size=1, pipeline_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto, quantization_param_path=None, device_config=cuda, decoding_config=DecodingConfig(guided_decoding_backend='outlines'), observability_config=ObservabilityConfig(otlp_traces_endpoint=None, collect_model_forward_time=False, collect_model_execute_time=False), seed=0, served_model_name=mistralai/Mistral-7B-Instruct-v0.2, use_v2_block_manager=True, num_scheduler_steps=1, chunked_prefill_enabled=False multi_step_stream_outputs=True, enable_prefix_caching=False, use_async_output_proc=True, use_cached_outputs=False, mm_processor_kwargs=None)
-/ihome/dvillarreal/alc307/.local/lib/python3.9/site-packages/vllm/transformers_utils/tokenizer_group/tokenizer_group.py:23: FutureWarning: It is strongly recommended to run mistral models with `--tokenizer_mode "mistral"` to ensure correct encoding and decoding.
-  self.tokenizer = get_tokenizer(self.tokenizer_id, **tokenizer_config)
-[W1111 01:55:34.921637214 socket.cpp:697] [c10d] The client socket cannot be initialized to connect to [gpu-n36.crc.pitt.edu]:41160 (errno: 97 - Address family not supported by protocol).
-INFO 11-11 01:55:34 model_runner.py:1060] Starting to load model mistralai/Mistral-7B-Instruct-v0.2...
-INFO 11-11 01:55:34 weight_utils.py:243] Using model weights format ['*.safetensors']
-Loading safetensors checkpoint shards:   0% Completed | 0/3 [00:00<?, ?it/s]
-Loading safetensors checkpoint shards:  33% Completed | 1/3 [00:01<00:02,  1.15s/it]
-Loading safetensors checkpoint shards:  67% Completed | 2/3 [00:02<00:01,  1.26s/it]
-Loading safetensors checkpoint shards: 100% Completed | 3/3 [00:03<00:00,  1.25s/it]
-Loading safetensors checkpoint shards: 100% Completed | 3/3 [00:03<00:00,  1.24s/it]
-
-INFO 11-11 01:55:38 model_runner.py:1071] Loading model weights took 13.4966 GB
-INFO 11-11 01:55:41 gpu_executor.py:122] # GPU blocks: 9124, # CPU blocks: 2048
-INFO 11-11 01:55:41 gpu_executor.py:126] Maximum concurrency for 32768 tokens per request: 4.46x
-INFO 11-11 01:55:42 model_runner.py:1402] Capturing the model for CUDA graphs. This may lead to unexpected consequences if the model is not static. To run the model in eager mode, set 'enforce_eager=True' or use '--enforce-eager' in the CLI.
-INFO 11-11 01:55:42 model_runner.py:1406] CUDA graphs can take additional 1~3 GiB memory per GPU. If you are running out of memory, consider decreasing `gpu_memory_utilization` or enforcing eager mode. You can also reduce the `max_num_seqs` as needed to decrease memory usage.
-INFO 11-11 01:55:54 model_runner.py:1530] Graph capturing finished in 13 secs.
-[rank0]: Traceback (most recent call last):
-[rank0]:   File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 142, in <module>
-[rank0]:     main(args)
-[rank0]:   File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompt-llms.py", line 55, in main
-[rank0]:     prompts = list(
-[rank0]:   File "/ihome/dvillarreal/alc307/projects/essay_eval/ELLIPSE_EXPERIMENT/prompts.py", line 85, in batch_prompts
-[rank0]:     for prompt, essay in zip(kwargs["essay_prompts"], kwargs["essays"]):
-[rank0]: KeyError: 'essay_prompts'

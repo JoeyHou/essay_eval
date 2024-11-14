@@ -61,7 +61,7 @@ def main(args: argparse.Namespace):
 
     start = f"EXPERIMENT DATE: {datetime.datetime.now().isoformat()}"
 
-    log.log(start)
+    log.info(start)
     debug.debug(start)
     err.error(start)
 
@@ -110,15 +110,14 @@ def main(args: argparse.Namespace):
         )
 
     # Run and print model output
-    for i in tqdm(range(0, len(prompts), args.batch), desc="Running model on dataset..."):
+    outputs = llm.generate(prompts, sampling_params)
 
-        outputs = llm.generate(prompts[i: i + args.batch], sampling_params)
+    # Print the outputs.
+    for output in tqdm(outputs, desc="Running model on dataset..."):
 
-        for output in outputs:
-
-            prompt = output.prompt
-            generated_text = output.outputs[0].text
-            log.info(f"Generated text: {generated_text!r}")
+        prompt = output.prompt
+        generated_text = output.outputs[0].text
+        log.info(f"Generated text: {generated_text!r}")
 
 
 def add_args(parser: argparse.ArgumentParser):
