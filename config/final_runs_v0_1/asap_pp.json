@@ -1,0 +1,44 @@
+{
+    "experiment_lst": [
+        {
+            "run_id": "final_v0_1/asap_fg_pp",
+            "fine_grained": true,
+            "use_asap_pp_rubric": true
+        },
+        {
+            "run_id": "final_v0_1/asap_fg_pp_unique_word",
+            "fine_grained": true,
+            "use_asap_pp_rubric": true,
+            "ling_features": [
+                 "HAPAX"
+             ]
+        },
+        {
+            "run_id": "final_v0_1/asap_fg_pp_top_3",
+            "fine_grained": true,
+            "use_asap_pp_rubric": true,
+            "ling_features": [
+                 "HAPAX",
+                 "LEMMA_COUNT",
+                 "COMPLEX_WORDS_DC"
+             ]
+        },
+        {
+            "run_id": "final_v0_1/asap_fg_pp_full_feat",
+            "fine_grained": true,
+            "use_asap_pp_rubric": true,
+            "ling_features": [
+                 "HAPAX",
+                 "WORD_COUNT",
+                 "SENTENCE_COUNT",
+                 "ESS_CHAR_LEN",
+                 "LEMMA_COUNT",
+                 "NOUN_COUNT",
+                 "STOP_WORD_COUNT",
+                 "COMPLEX_WORDS_DC",
+                 "CHARACTERS",
+                 "LONG_WORD"
+             ]
+        }
+    ]
+}

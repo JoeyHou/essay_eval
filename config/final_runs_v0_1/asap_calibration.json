@@ -1,0 +1,42 @@
+{    
+    "dataset": "asap",
+    "split": "dev",
+    "experiment_lst": [
+        {
+            "run_id": "final_v0_1/asap_default_cali",
+            "calibration": true
+        },
+        {
+            "run_id": "final_v0_1/asap_default_unique_word_cali",
+            "ling_features": [
+                "HAPAX"
+            ],
+            "calibration": true
+        },
+        {
+            "run_id": "final_v0_1/asap_default_top_3_cali",
+            "ling_features": [
+                "HAPAX",
+                "LEMMA_COUNT",
+                "COMPLEX_WORDS_DC"
+            ],
+            "calibration": true
+        },
+        {
+            "run_id": "final_v0_1/asap_default_full_feat_cali",
+            "ling_features": [
+                "HAPAX",
+                "WORD_COUNT",
+                "SENTENCE_COUNT",
+                "ESS_CHAR_LEN",
+                "LEMMA_COUNT",
+                "NOUN_COUNT",
+                "STOP_WORD_COUNT",
+                "COMPLEX_WORDS_DC",
+                "CHARACTERS",
+                "LONG_WORD"
+            ],
+            "calibration": true
+        }
+    ]
+}

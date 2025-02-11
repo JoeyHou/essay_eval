@@ -14,6 +14,10 @@ run.sh
 
 dev_joey.md
 
+config/archived/
+config/test_calibration/
+config/test/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

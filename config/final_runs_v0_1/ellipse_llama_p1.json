@@ -1,0 +1,28 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "final_v0_1/llama_ellipse_default",
+            "model": "llama3"
+        },
+        {
+           "run_id": "final_v0_1/llama_ellipse_fg",
+           "fine_grained": true,
+            "model": "llama3"
+        },
+        {
+            "run_id": "final_v0_1/llama_ellipse_default_unique_word",
+            "ling_features": [
+                "HAPAX"
+            ],
+            "model": "llama3"
+        },
+        {
+           "run_id": "final_v0_1/llama_ellipse_fg_unique_word",
+           "fine_grained": true,
+           "ling_features": [
+                "HAPAX"
+            ],
+            "model": "llama3"
+        }
+    ]
+}

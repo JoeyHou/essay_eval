@@ -1,0 +1,56 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "final_v0_1/llama_ellipse_default_top_3",
+            "ling_features": [
+                "HAPAX",
+                "LEMMA_COUNT",
+                "COMPLEX_WORDS_DC"
+            ],
+            "model": "llama3"
+        },
+        {
+           "run_id": "final_v0_1/llama_ellipse_fg_humat_top_3",
+           "fine_grained": true,
+           "ling_features": [
+                "HAPAX",
+                "LEMMA_COUNT",
+                "COMPLEX_WORDS_DC"
+            ],
+            "model": "llama3"
+        },
+        {
+            "run_id": "final_v0_1/llama_ellipse_default_full_feat",
+            "ling_features": [
+                "HAPAX",
+                "WORD_COUNT",
+                "SENTENCE_COUNT",
+                "ESS_CHAR_LEN",
+                "LEMMA_COUNT",
+                "NOUN_COUNT",
+                "STOP_WORD_COUNT",
+                "COMPLEX_WORDS_DC",
+                "CHARACTERS",
+                "LONG_WORD"
+            ],
+            "model": "llama3"
+        },
+        {
+           "run_id": "final_v0_1/llama_ellipse_fg_humat_full_feat",
+           "fine_grained": true,
+           "ling_features": [
+                "HAPAX",
+                "WORD_COUNT",
+                "SENTENCE_COUNT",
+                "ESS_CHAR_LEN",
+                "LEMMA_COUNT",
+                "NOUN_COUNT",
+                "STOP_WORD_COUNT",
+                "COMPLEX_WORDS_DC",
+                "CHARACTERS",
+                "LONG_WORD"
+            ],
+            "model": "llama3"
+        }
+    ]
+}

@@ -1,0 +1,41 @@
+{
+    "dataset": "ellipse",
+    "experiment_lst": [
+        {
+            "run_id": "final_v0_1/ellipse_default_cali",
+            "calibration": true
+        },
+        {
+            "run_id": "final_v0_1/ellipse_default_unique_word_cali",
+            "calibration": true,
+            "ling_features": [
+                "HAPAX"
+            ]
+        },
+        {
+            "run_id": "final_v0_1/ellipse_default_top_3_cali",
+            "calibration": true,
+            "ling_features": [
+                "HAPAX",
+                "LEMMA_COUNT",
+                "COMPLEX_WORDS_DC"
+            ]
+        },
+        {
+            "run_id": "final_v0_1/ellipse_default_full_feat_cali",
+            "calibration": true,
+            "ling_features": [
+                "HAPAX",
+                "WORD_COUNT",
+                "SENTENCE_COUNT",
+                "ESS_CHAR_LEN",
+                "LEMMA_COUNT",
+                "NOUN_COUNT",
+                "STOP_WORD_COUNT",
+                "COMPLEX_WORDS_DC",
+                "CHARACTERS",
+                "LONG_WORD"
+            ]
+        }
+    ]
+}

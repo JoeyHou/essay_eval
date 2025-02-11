@@ -1,0 +1,44 @@
+{
+    "experiment_lst": [
+        {
+            "run_id": "final_v0_1/ellipse_fg_machine",
+            "fine_grained": true,
+            "use_machine_rubric": true
+        },
+        {
+            "run_id": "final_v0_1/ellipse_fg_machine_unique_word",
+            "fine_grained": true,
+            "use_machine_rubric": true,
+            "ling_features": [
+                 "HAPAX"
+             ]
+        },
+        {
+            "run_id": "final_v0_1/ellipse_fg_machine_top_3",
+            "fine_grained": true,
+            "use_machine_rubric": true,
+            "ling_features": [
+                 "HAPAX",
+                 "LEMMA_COUNT",
+                 "COMPLEX_WORDS_DC"
+             ]
+        },
+        {
+            "run_id": "final_v0_1/ellipse_fg_machine_full_feat",
+            "fine_grained": true,
+            "use_machine_rubric": true,
+            "ling_features": [
+                 "HAPAX",
+                 "WORD_COUNT",
+                 "SENTENCE_COUNT",
+                 "ESS_CHAR_LEN",
+                 "LEMMA_COUNT",
+                 "NOUN_COUNT",
+                 "STOP_WORD_COUNT",
+                 "COMPLEX_WORDS_DC",
+                 "CHARACTERS",
+                 "LONG_WORD"
+             ]
+        }
+    ]
+}

@@ -1,5 +1,0 @@
-{
-    "logging_data_path": "./log/fine_grained/fine_grained_v0.4.json",
-    "model": "mistral",
-    "limit": 2
-}

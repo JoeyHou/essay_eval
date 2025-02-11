@@ -1,0 +1,24 @@
+{    
+    "experiment_lst": [
+        {
+            "run_id": "final_v0_2/gpt4_asap_default",
+            "model": "gpt-4"
+        },
+        {
+            "run_id": "final_v0_2/gpt4_asap_full_feat",
+            "model": "gpt-4",
+            "ling_features": [
+                "HAPAX",
+                "WORD_COUNT",
+                "SENTENCE_COUNT",
+                "ESS_CHAR_LEN",
+                "LEMMA_COUNT",
+                "NOUN_COUNT",
+                "STOP_WORD_COUNT",
+                "COMPLEX_WORDS_DC",
+                "CHARACTERS",
+                "LONG_WORD"
+            ]
+        }
+    ]
+}
