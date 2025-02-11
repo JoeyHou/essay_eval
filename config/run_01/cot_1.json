@@ -1,6 +1,0 @@
-{
-    "analysis_instruction": "cot",
-    "model": "mistral",
-    "prompt_template": 1,
-    "run_id": "text_v0_1_cot_tmp1"
-}

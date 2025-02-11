@@ -17,6 +17,7 @@ dev_joey.md
 config/archived/
 config/test_calibration/
 config/test/*
+test_llama31.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
